@@ -2,8 +2,9 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
+import { writeUserData } from "./router.js";
 
+const router = express.Router();
 const app = express();
 const fetch = (...args) =>
   import(node - fetch).then(({ default: fetch }) => fetch(...args));
@@ -20,11 +21,19 @@ const firebaseConfig = {
   measurementId: "G-CM76FGV328",
 };
 
+export const firebase = initializeApp(firebaseConfig);
+
 app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
   res.send("hello world");
+});
+
+app.post("/new-article", (req, res) => {
+  const { userId, name, data, isAdded } = req.body;
+  writeUserData(userId, name, data, isAdded);
+  res.send("Article added successfully.");
 });
 
 app.listen(4000, function () {
