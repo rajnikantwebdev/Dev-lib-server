@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
-import { writeUserData } from "./router.js";
+import { getAllData, writeUserData } from "./router.js";
 
 const router = express.Router();
 const app = express();
@@ -31,9 +31,25 @@ app.get("/", (req, res) => {
 });
 
 app.post("/new-article", (req, res) => {
-  const { userId, name, data, isAdded } = req.body;
-  writeUserData(userId, name, data, isAdded);
+  const { userId, name, youtubeLink } = req.body;
+  writeUserData(userId, name, youtubeLink);
   res.send("Article added successfully.");
+});
+
+app.get("/all-data", async (req, res) => {
+  try {
+    const data = await getAllData();
+    console.log(
+      "data: ",
+      data.map((d) => {
+        return d;
+      })
+    );
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send("Error fetching data");
+  }
 });
 
 app.listen(4000, function () {
