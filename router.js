@@ -9,7 +9,7 @@ import {
 } from "firebase/database";
 import { firebase } from "./server.js";
 
-export const writeUserData = (userId, name, youtubeLink) => {
+export const writeUserData = (userId, name, youtubeLink, tags, uniqueId) => {
   const db = getDatabase(firebase);
   const newPost = ref(db, `users/${userId}`);
   const newPostRef = push(newPost);
@@ -17,6 +17,8 @@ export const writeUserData = (userId, name, youtubeLink) => {
     userId: userId,
     name: name,
     youtubeLink: youtubeLink,
+    tags: tags,
+    uniqueId: uniqueId,
   });
 };
 

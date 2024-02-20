@@ -31,8 +31,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/new-article", (req, res) => {
-  const { userId, name, youtubeLink } = req.body;
-  writeUserData(userId, name, youtubeLink);
+  const { userId, name, youtubeLink, tags, uniqueId } = req.body;
+  writeUserData(userId, name, youtubeLink, tags, uniqueId);
   res.send("Article added successfully.");
 });
 
