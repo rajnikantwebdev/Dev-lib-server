@@ -29,7 +29,7 @@ export const getAllData = () => {
 
     try {
       const getData = await get(child(dbRef, "users/"));
-      // console.log("get-data: ", getData);
+
       const snapshot = getData;
       if (snapshot.exists()) {
         snapshot.forEach((childSnapshot) => {
