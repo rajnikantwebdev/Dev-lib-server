@@ -1,50 +1,57 @@
-var express = require('express');
-var cors = require('cors');
-const fetch =(...args)=>
-import (node-fetch).then(({default:fetch})=>fetch(...args));
-var bodyParser= require('body-parser');
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import { initializeApp } from "firebase/app";
+import { getAllData, writeUserData } from "./router.js";
 
+const router = express.Router();
+const app = express();
+const fetch = (...args) =>
+  import(node - fetch).then(({ default: fetch }) => fetch(...args));
 
+const firebaseConfig = {
+  apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
+  authDomain: "devlib-c6572.firebaseapp.com",
+  databaseURL:
+    "https://devlib-c6572-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "devlib-c6572",
+  storageBucket: "devlib-c6572.appspot.com",
+  messagingSenderId: "553953347527",
+  appId: "1:553953347527:web:2ebde7a35ff5917e2cbbe2",
+  measurementId: "G-CM76FGV328",
+};
 
-const client_id='d8c29a8e39a37033822a'
-const client_secret="fb427bdd9e6c3c64fea299db8fe9aa9bce2496ef"
+export const firebase = initializeApp(firebaseConfig);
 
+app.use(cors());
+app.use(bodyParser.json());
 
+app.get("/", (req, res) => {
+  res.send("hello world");
+});
 
+app.post("/new-article", (req, res) => {
+  const { userId, name, youtubeLink, tags, uniqueId } = req.body;
+  writeUserData(userId, name, youtubeLink, tags, uniqueId);
+  res.send("Article added successfully.");
+});
 
+app.get("/all-data", async (req, res) => {
+  try {
+    const data = await getAllData();
+    console.log(
+      "data: ",
+      data.map((d) => {
+        return d;
+      })
+    );
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send("Error fetching data");
+  }
+});
 
-
-var app=express()
-app.use(cors())
-app.use(bodyParser.json())
-
-
-app.get('/getAccessToken',async function(req,res){
-
-
-    req.query.code;
-
-    const param ="?client_id="+client_id+"&client_secret="+client_secret+"&code="+req.query.code;
-
-    await fetch('https://github.com/login/oauth/access_token'+param,{
-        method:'POST',
-        headers:{
-           "Accept":'application/json' 
-        }
-    }).then((response)=>{
-        return response.json()
-    }).then((data)=>{
-        console.log(data)
-         res.json(data)
-    })
-
-})
-
-
-
-app.get('/getuserdata')
-
-
-app.listen(4000,function(){
-    console.log("Cors server Running on Port 4000")
-})
+app.listen(4000, function () {
+  console.log("Cors server Running on Port 4000");
+});
