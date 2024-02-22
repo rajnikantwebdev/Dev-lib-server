@@ -2,8 +2,10 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
-import { getAllData, writeUserData } from "./router.js";
+import { getAllData, getUsers, addUserId } from "./router.js";
+import pkg from "pg";
 
+const { Pool } = pkg;
 const router = express.Router();
 const app = express();
 const fetch = (...args) =>
@@ -21,6 +23,14 @@ const firebaseConfig = {
   measurementId: "G-CM76FGV328",
 };
 
+export const pool = new Pool({
+  user: "rajni",
+  host: "localhost",
+  database: "api",
+  password: "rajnidatabase",
+  port: 5432,
+});
+
 export const firebase = initializeApp(firebaseConfig);
 
 app.use(cors());
@@ -30,11 +40,15 @@ app.get("/", (req, res) => {
   res.send("hello world");
 });
 
-app.post("/new-article", (req, res) => {
-  const { userId, name, youtubeLink, tags, uniqueId } = req.body;
-  writeUserData(userId, name, youtubeLink, tags, uniqueId);
-  res.send("Article added successfully.");
-});
+app.get("/users", getUsers);
+
+app.post("/adduser", addUserId);
+
+// app.post("/new-article", (req, res) => {
+//   const { userId, name, youtubeLink, tags, uniqueId } = req.body;
+//   writeUserData(userId, name, youtubeLink, tags, uniqueId);
+//   res.send("Article added successfully.");
+// });
 
 app.get("/all-data", async (req, res) => {
   try {
