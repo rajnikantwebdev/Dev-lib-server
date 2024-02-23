@@ -70,3 +70,5 @@ app.get("/all-data", async (req, res) => {
 app.listen(process.env.PORT, function () {
   console.log("Cors server Running on Port 4000");
 });
+
+export default app;
