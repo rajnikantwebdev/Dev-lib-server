@@ -13,11 +13,12 @@ const app = express();
 const fetch = (...args) =>
   import(node - fetch).then(({ default: fetch }) => fetch(...args));
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-  })
-);
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 const firebaseConfig = {
   apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
   authDomain: "devlib-c6572.firebaseapp.com",
