@@ -25,11 +25,7 @@ const firebaseConfig = {
 };
 
 export const pool = new Pool({
-  user: process.env.USER,
-  host: process.env.HOST,
-  database: process.env.DATABASE,
-  password: process.env.DATABASE_PASSWORD,
-  port: process.env.DATABASE_PORT,
+  connectionString: process.env.POSTGRES_URL,
 });
 
 export const firebase = initializeApp(firebaseConfig);
