@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
 import { getAllData, getUsers, addUserId } from "./router.js";
 import pkg from "pg";
+import "dotenv/config";
 
 const { Pool } = pkg;
 const router = express.Router();
@@ -24,11 +25,11 @@ const firebaseConfig = {
 };
 
 export const pool = new Pool({
-  user: "rajni",
-  host: "localhost",
-  database: "api",
-  password: "rajnidatabase",
-  port: 5432,
+  user: process.env.USER,
+  host: process.env.HOST,
+  database: process.env.DATABASE,
+  password: process.env.DATABASE_PASSWORD,
+  port: process.env.DATABASE_PORT,
 });
 
 export const firebase = initializeApp(firebaseConfig);
@@ -66,6 +67,6 @@ app.get("/all-data", async (req, res) => {
   }
 });
 
-app.listen(4000, function () {
+app.listen(process.env.PORT, function () {
   console.log("Cors server Running on Port 4000");
 });
