@@ -9,9 +9,15 @@ import "dotenv/config";
 const { Pool } = pkg;
 const router = express.Router();
 const app = express();
+
 const fetch = (...args) =>
   import(node - fetch).then(({ default: fetch }) => fetch(...args));
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 const firebaseConfig = {
   apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
   authDomain: "devlib-c6572.firebaseapp.com",
@@ -29,12 +35,6 @@ export const pool = new Pool({
 });
 
 export const firebase = initializeApp(firebaseConfig);
-
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-  })
-);
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
