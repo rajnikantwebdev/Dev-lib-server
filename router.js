@@ -45,7 +45,9 @@ export const addUserId = (request, response) => {
       if (error) {
         throw error;
       }
-      response.status(201).send("user id added successfully", result.rows[0]);
+      response
+        .status(201)
+        .send({ message: "user id added successfully", user: result.rows[0] });
     }
   );
 };
