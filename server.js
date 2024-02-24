@@ -1,5 +1,5 @@
 import express from "express";
-import cors from "cors";
+// import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
 import { getAllData, getUsers, addUserId } from "./router.js";
@@ -13,12 +13,13 @@ const app = express();
 const fetch = (...args) =>
   import(node - fetch).then(({ default: fetch }) => fetch(...args));
 
-const corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//   origin: "http://localhost:3000",
+//   credentials: true, //access-control-allow-credentials:true
+//   optionSuccessStatus: 200,
+// };
+// app.use(cors(corsOptions));
+
 const firebaseConfig = {
   apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
   authDomain: "devlib-c6572.firebaseapp.com",
@@ -69,7 +70,7 @@ app.get("/all-data", async (req, res) => {
 });
 
 app.listen(process.env.PORT, function () {
-  console.log("Cors server Running on Port 4000");
+  console.log("server Running on Port 4000");
 });
 
 export default app;
