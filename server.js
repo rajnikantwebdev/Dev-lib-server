@@ -1,5 +1,5 @@
 import express from "express";
-// import cors from "cors";
+import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
 import { getAllData, getUsers, addUserId } from "./router.js";
@@ -18,7 +18,12 @@ const fetch = (...args) =>
 //   credentials: true, //access-control-allow-credentials:true
 //   optionSuccessStatus: 200,
 // };
-// app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Allow requests from http://localhost:3000
+    credentials: true,
+  })
+);
 
 const firebaseConfig = {
   apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
