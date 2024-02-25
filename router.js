@@ -38,6 +38,7 @@ export const writeUserData = (request, response) => {
 
 export const addUserId = (request, response) => {
   const { userId } = request.body;
+  console.log("userId: ", userId);
   pool.query(
     "INSERT INTO users (user_id) VALUES($1) RETURNING *",
     [userId],
@@ -51,19 +52,6 @@ export const addUserId = (request, response) => {
     }
   );
 };
-
-// export const writeUserData = (userId, name, youtubeLink, tags, uniqueId) => {
-//   const db = getDatabase(firebase);
-//   const newPost = ref(db, `users/${userId}`);
-//   const newPostRef = push(newPost);
-//   set(newPostRef, {
-//     userId: userId,
-//     name: name,
-//     youtubeLink: youtubeLink,
-//     tags: tags,
-//     uniqueId: uniqueId,
-//   });
-// };
 
 export const getAllData = () => {
   return new Promise(async (resolve, reject) => {
