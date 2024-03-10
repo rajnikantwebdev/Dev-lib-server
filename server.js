@@ -36,9 +36,8 @@ const firebaseConfig = {
   appId: "1:553953347527:web:2ebde7a35ff5917e2cbbe2",
   measurementId: "G-CM76FGV328",
 };
-
+// connectionString: process.env.POSTGRES_URL,
 export const pool = new Pool({
-  // connectionString: process.env.POSTGRES_URL,
   host: process.env.HOST,
   user: process.env.USER,
   database: process.env.DATABASE,
