@@ -73,7 +73,7 @@ export const getAllData = () => {
       }
     } catch (error) {
       console.log("error-getting-all-data: ", error);
-      reject(err);
+      reject(error);
     }
   });
 };
