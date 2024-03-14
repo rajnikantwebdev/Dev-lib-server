@@ -46,6 +46,24 @@ export const writeUserData = (body) => {
   });
 };
 
+export const getAllVideoData = () => {
+  return new Promise(function (resolve, reject) {
+    pool.query("SELECT * FROM ytvidcontainer", (error, result) => {
+      if (error) {
+        reject(error);
+      }
+      if (result && result.rows) {
+        resolve({
+          message: "data founded",
+          data: result.rows,
+        });
+      } else {
+        reject(new Error("Data not founded, try again later"));
+      }
+    });
+  });
+};
+
 export const addUserId = (body) => {
   return new Promise(function (resolve, reject) {
     const { userId } = body;

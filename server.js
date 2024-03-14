@@ -2,7 +2,12 @@ import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
-import { getAllData, getUsers, addUserId, writeUserData } from "./router.js";
+import {
+  getAllData,
+  getAllVideoData,
+  addUserId,
+  writeUserData,
+} from "./router.js";
 import pkg from "pg";
 import "dotenv/config";
 
@@ -85,6 +90,17 @@ app.post("/add-yt-vid", (req, res) => {
   writeUserData(req.body)
     .then((response) => {
       res.status(200).send(response);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
+app.get("/get-yt-vid", (req, res) => {
+  getAllVideoData()
+    .then((response) => {
+      console.log("response: ", response.data);
+      res.status(200).send(response.data);
     })
     .catch((error) => {
       res.status(500).send(error);
