@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
@@ -63,7 +63,7 @@ app.get("/", (req, res) => {
   res.send("hello world");
 });
 
-app.get("/users", getUsers);
+// app.get("/users", getUsers);
 
 app.post("/adduser", (req, res) => {
   addUserId(req.body)
@@ -75,27 +75,37 @@ app.post("/adduser", (req, res) => {
     });
 });
 
-app.post("/new-article", (req, res) => {
-  const { userId, name, youtubeLink, tags, uniqueId } = req.body;
-  writeUserData(userId, name, youtubeLink, tags, uniqueId);
-  res.send("Article added successfully.");
+// app.post("/new-article", (req, res) => {
+//   const { userId, name, youtubeLink, tags, uniqueId } = req.body;
+//   writeUserData(userId, name, youtubeLink, tags, uniqueId);
+//   res.send("Article added successfully.");
+// });
+
+app.post("/add-yt-vid", (req, res) => {
+  writeUserData(req.body)
+    .then((response) => {
+      res.status(200).send(response);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 });
 
-app.get("/all-data", async (req, res) => {
-  try {
-    const data = await getAllData();
-    console.log(
-      "data: ",
-      data.map((d) => {
-        return d;
-      })
-    );
-    res.json(data);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).send("Error fetching data");
-  }
-});
+// app.get("/all-data", async (req, res) => {
+//   try {
+//     const data = await getAllData();
+//     console.log(
+//       "data: ",
+//       data.map((d) => {
+//         return d;
+//       })
+//     );
+//     res.json(data);
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     res.status(500).send("Error fetching data");
+//   }
+// });
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");

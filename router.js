@@ -18,28 +18,37 @@ export const getUsers = (request, response) => {
   });
 };
 
-export const writeUserData = (request, response) => {
-  const { userId, youtubeVideoId, tags } = request.body;
-  const dataObj = { youtubeVideoId, tags };
-  const jsonData = JSON.stringify(dataObj);
+export const writeUserData = (body) => {
+  return new Promise(function (resolve, reject) {
+    const { userId, youtubeVideoId, tags } = body;
 
-  const youtubeVideoIdArray = [jsonData];
-  pool.query(
-    "INSERT INTO youtubevideos (id, ytvid) VALUES ($1, $2) RETURNING *",
-    [userId, youtubeVideoIdArray],
-    (error, result) => {
-      if (error) {
-        throw error;
+    const dataObj = { youtubeVideoId, tags };
+    const jsonData = JSON.stringify(dataObj);
+    const yt_vid_data = [jsonData];
+    console.log("userId: ", userId);
+    pool.query(
+      "INSERT INTO ytvidcontainer (user_id, yt_vid_data) VALUES ($1, $2) RETURNING *",
+      [userId, yt_vid_data],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        }
+        if (result && result.rows) {
+          resolve({
+            message: "A new youtube-video has been added",
+            data: result.rows[0],
+          });
+        } else {
+          reject(new Error("Data not added, try again later"));
+        }
       }
-      response.status(201).send(`User added with Id`);
-    }
-  );
+    );
+  });
 };
 
 export const addUserId = (body) => {
   return new Promise(function (resolve, reject) {
     const { userId } = body;
-    console.log("userId: ", userId);
     pool.query(
       "INSERT INTO users (user_id) VALUES($1) RETURNING *",
       [userId],
@@ -49,7 +58,7 @@ export const addUserId = (body) => {
         }
         if (result && result.rows) {
           resolve(
-            `A new merchant has been added: ${JSON.stringify(result.rows[0])}`
+            `A new userId has been added: ${JSON.stringify(result.rows[0])}`
           );
         } else {
           reject(new Error("No results found"));
