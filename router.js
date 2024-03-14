@@ -36,21 +36,27 @@ export const writeUserData = (request, response) => {
   );
 };
 
-export const addUserId = (request, response) => {
-  const { userId } = request.body;
-  console.log("userId: ", userId);
-  pool.query(
-    "INSERT INTO users (user_id) VALUES($1) RETURNING *",
-    [userId],
-    (error, result) => {
-      if (error) {
-        throw error;
+export const addUserId = (body) => {
+  return new Promise(function (resolve, reject) {
+    const { userId } = body;
+    console.log("userId: ", userId);
+    pool.query(
+      "INSERT INTO users (user_id) VALUES($1) RETURNING *",
+      [userId],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        }
+        if (result && result.rows) {
+          resolve(
+            `A new merchant has been added: ${JSON.stringify(result.rows[0])}`
+          );
+        } else {
+          reject(new Error("No results found"));
+        }
       }
-      response
-        .status(201)
-        .send({ message: "user id added successfully", user: result.rows[0] });
-    }
-  );
+    );
+  });
 };
 
 export const getAllData = () => {

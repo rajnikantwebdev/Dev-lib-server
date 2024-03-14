@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
-import { getAllData, getUsers, addUserId } from "./router.js";
+import { getAllData, getUsers, addUserId, writeUserData } from "./router.js";
 import pkg from "pg";
 import "dotenv/config";
 
@@ -25,6 +25,18 @@ app.use(
   })
 );
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Access-Control-Allow-Headers"
+  );
+  next();
+});
+
 const firebaseConfig = {
   apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
   authDomain: "devlib-c6572.firebaseapp.com",
@@ -46,7 +58,6 @@ export const pool = new Pool({
 });
 
 export const firebase = initializeApp(firebaseConfig);
-app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
   res.send("hello world");
@@ -54,13 +65,21 @@ app.get("/", (req, res) => {
 
 app.get("/users", getUsers);
 
-app.post("/adduser", addUserId);
+app.post("/adduser", (req, res) => {
+  addUserId(req.body)
+    .then((response) => {
+      res.status(200).send(response);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
 
-// app.post("/new-article", (req, res) => {
-//   const { userId, name, youtubeLink, tags, uniqueId } = req.body;
-//   writeUserData(userId, name, youtubeLink, tags, uniqueId);
-//   res.send("Article added successfully.");
-// });
+app.post("/new-article", (req, res) => {
+  const { userId, name, youtubeLink, tags, uniqueId } = req.body;
+  writeUserData(userId, name, youtubeLink, tags, uniqueId);
+  res.send("Article added successfully.");
+});
 
 app.get("/all-data", async (req, res) => {
   try {
