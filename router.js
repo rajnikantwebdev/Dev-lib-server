@@ -7,6 +7,8 @@ import {
   child,
   push,
 } from "firebase/database";
+
+
 import { firebase, pool } from "./server.js";
 
 export const getUsers = (request, response) => {
@@ -17,6 +19,8 @@ export const getUsers = (request, response) => {
     response.status(200).json(res.rows);
   });
 };
+
+
 
 export const writeUserData = (body) => {
   return new Promise(function (resolve, reject) {
