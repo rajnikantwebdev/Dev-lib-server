@@ -20,19 +20,18 @@ export const getUsers = (request, response) => {
   });
 };
 
-
-
+// api so that user can upload youtube video
 export const writeUserData = (body) => {
   return new Promise(function (resolve, reject) {
-    const { userId, youtubeVideoId, tags } = body;
+    const { userId, title, vid_id } = body;
 
-    const dataObj = { youtubeVideoId, tags };
-    const jsonData = JSON.stringify(dataObj);
-    const yt_vid_data = [jsonData];
-    console.log("userId: ", userId);
+    // const dataObj = { youtubeVideoId, tags };
+    // const jsonData = JSON.stringify(dataObj);
+    // const yt_vid_data = [jsonData];
+    // console.log("userId: ", userId);
     pool.query(
-      "INSERT INTO ytvidcontainer (user_id, yt_vid_data) VALUES ($1, $2) RETURNING *",
-      [userId, yt_vid_data],
+      "INSERT INTO ytvid (user_id, title, vid_id, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING *",
+      [userId, title, vid_id],
       (error, result) => {
         if (error) {
           reject(error);
@@ -50,9 +49,10 @@ export const writeUserData = (body) => {
   });
 };
 
+//api to get all youtube videos
 export const getAllVideoData = () => {
   return new Promise(function (resolve, reject) {
-    pool.query("SELECT * FROM ytvidcontainer", (error, result) => {
+    pool.query("SELECT * FROM ytvid", (error, result) => {
       if (error) {
         reject(error);
       }
@@ -90,27 +90,39 @@ export const addUserId = (body) => {
   });
 };
 
-export const getAllData = () => {
-  return new Promise(async (resolve, reject) => {
-    const dbRef = ref(getDatabase(firebase));
-    const dataArray = [];
-
-    try {
-      const getData = await get(child(dbRef, "users/"));
-
-      const snapshot = getData;
-      if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-          dataArray.push(childSnapshot.val());
-        });
-
-        resolve(dataArray);
-      } else {
-        resolve([]);
+export const increaseLikeCount = (id) => {
+  return new Promise(function (resolve, reject) {
+    pool.query(
+      "UPDATE ytvid SET like_count = like_count + 1 WHERE vid_id = $1",
+      [id],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result.rowCount);
+        }
       }
-    } catch (error) {
-      console.log("error-getting-all-data: ", error);
-      reject(error);
-    }
+    );
+  });
+};
+
+export const getLikeCount = (vid_id) => {
+  return new Promise(function (resolve, reject) {
+    pool.query(
+      "SELECT * FROM ytvid WHERE vid_id = $1",
+      [vid_id],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          if (result.rows.length > 0) {
+            console.log("result: ", result.rows);
+            resolve(result.rows[0].like_count);
+          } else {
+            resolve(0);
+          }
+        }
+      }
+    );
   });
 };

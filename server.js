@@ -3,10 +3,11 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
 import {
-  getAllData,
+  increaseLikeCount,
   getAllVideoData,
   addUserId,
   writeUserData,
+  getLikeCount,
 } from "./router.js";
 import pkg from "pg";
 import "dotenv/config";
@@ -80,12 +81,7 @@ app.post("/adduser", (req, res) => {
     });
 });
 
-// app.post("/new-article", (req, res) => {
-//   const { userId, name, youtubeLink, tags, uniqueId } = req.body;
-//   writeUserData(userId, name, youtubeLink, tags, uniqueId);
-//   res.send("Article added successfully.");
-// });
-
+// add youtube video in the database
 app.post("/add-yt-vid", (req, res) => {
   writeUserData(req.body)
     .then((response) => {
@@ -96,6 +92,7 @@ app.post("/add-yt-vid", (req, res) => {
     });
 });
 
+// get all the youtube video from the database
 app.get("/get-yt-vid", (req, res) => {
   getAllVideoData()
     .then((response) => {
@@ -107,21 +104,31 @@ app.get("/get-yt-vid", (req, res) => {
     });
 });
 
-// app.get("/all-data", async (req, res) => {
-//   try {
-//     const data = await getAllData();
-//     console.log(
-//       "data: ",
-//       data.map((d) => {
-//         return d;
-//       })
-//     );
-//     res.json(data);
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     res.status(500).send("Error fetching data");
-//   }
-// });
+app.post("/vid/increment-like-count", async (req, res) => {
+  try {
+    const vidId = req.body.video_id;
+    const rowCount = await increaseLikeCount(vidId);
+
+    res
+      .status(200)
+      .json({ message: `Like count updated for post ${vidId}`, rowCount });
+  } catch (error) {
+    console.log("Error updating like count: ", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/get-like-count", async (req, res) => {
+  try {
+    const vidId = req.body.video_id;
+    const rowCount = await getLikeCount(vidId);
+    console.log(rowCount);
+    res.status(200).send({ rowCount: rowCount });
+  } catch (error) {
+    console.log("Error updating like count: ", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");
