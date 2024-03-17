@@ -124,3 +124,22 @@ export const getLikeCount = (vid_id) => {
     );
   });
 };
+
+// api to add user like, user dislike and neither like neither dislike
+export const addUserLike = (body) => {
+  return new Promise(function (resolve, reject) {
+    const { userId, vid_id } = body;
+    pool.query(
+      "INSERT INTO user_likes (user_id, vid_id, isLike) VALUES ($1, $2, true)",
+      [userId, vid_id],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          console.log("user like added");
+          resolve(result);
+        }
+      }
+    );
+  });
+};

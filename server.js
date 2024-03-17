@@ -8,6 +8,7 @@ import {
   addUserId,
   writeUserData,
   getLikeCount,
+  addUserLike,
 } from "./router.js";
 import pkg from "pg";
 import "dotenv/config";
@@ -126,6 +127,16 @@ app.post("/get-like-count", async (req, res) => {
     res.status(200).send({ rowCount: rowCount });
   } catch (error) {
     console.log("Error updating like count: ", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/add-like", async (req, res) => {
+  try {
+    const response = await addUserLike(req.body);
+    res.status(200).send({ data: response });
+  } catch (error) {
+    console.log("Error adding like, ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
