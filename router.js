@@ -7,6 +7,8 @@ import {
   child,
   push,
 } from "firebase/database";
+
+
 import { firebase, pool } from "./server.js";
 
 export const getUsers = (request, response) => {
