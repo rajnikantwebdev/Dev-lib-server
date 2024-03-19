@@ -3,7 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { initializeApp } from "firebase/app";
 import {
-  increaseLikeCount,
+  addVideoId,
   getAllVideoData,
   addUserId,
   writeUserData,
@@ -105,17 +105,12 @@ app.get("/get-yt-vid", (req, res) => {
     });
 });
 
-app.post("/vid/increment-like-count", async (req, res) => {
+app.post("/api/addVideoId", async (req, res) => {
   try {
-    const vidId = req.body.video_id;
-    const rowCount = await increaseLikeCount(vidId);
-
-    res
-      .status(200)
-      .json({ message: `Like count updated for post ${vidId}`, rowCount });
+    const response = await addVideoId(req.body);
+    res.status(200).send({ data: response });
   } catch (error) {
-    console.log("Error updating like count: ", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: error });
   }
 });
 

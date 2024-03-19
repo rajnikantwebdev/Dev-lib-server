@@ -8,7 +8,6 @@ import {
   push,
 } from "firebase/database";
 
-
 import { firebase, pool } from "./server.js";
 
 export const getUsers = (request, response) => {
@@ -90,22 +89,42 @@ export const addUserId = (body) => {
   });
 };
 
-export const increaseLikeCount = (id) => {
+// export const increaseLikeCount = (id) => {
+//   return new Promise(function (resolve, reject) {
+//     pool.query(
+//       "UPDATE ytvid SET like_count = like_count + 1 WHERE vid_id = $1",
+//       [id],
+//       (error, result) => {
+//         if (error) {
+//           reject(error);
+//         } else {
+//           resolve(result.rowCount);
+//         }
+//       }
+//     );
+//   });
+// };
+
+// api to add increase like count of a particular video
+export const addVideoId = (body) => {
   return new Promise(function (resolve, reject) {
+    const { vid_id } = body;
+    console.log(vid_id);
     pool.query(
-      "UPDATE ytvid SET like_count = like_count + 1 WHERE vid_id = $1",
-      [id],
+      "INSERT INTO total_likes (vid_id, likes_count) VALUES($1, 0)",
+      [vid_id],
       (error, result) => {
         if (error) {
           reject(error);
         } else {
-          resolve(result.rowCount);
+          resolve(result);
         }
       }
     );
   });
 };
 
+// api to get like count of a particular video
 export const getLikeCount = (vid_id) => {
   return new Promise(function (resolve, reject) {
     pool.query(
@@ -138,7 +157,6 @@ export const addUserLike = (body) => {
         if (error) {
           reject(error);
         } else {
-          console.log("user like added");
           resolve(result);
         }
       }
