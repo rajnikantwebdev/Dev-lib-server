@@ -1,14 +1,4 @@
-import {
-  getDatabase,
-  set,
-  ref,
-  onValue,
-  get,
-  child,
-  push,
-} from "firebase/database";
-
-import { firebase, pool } from "./server.js";
+import { pool } from "./server.js";
 
 export const getUsers = (request, response) => {
   pool.query("SELECT * FROM youtubevideos ORDER BY id ASC", (err, res) => {
@@ -135,7 +125,7 @@ export const getLikeCount = (vid_id) => {
           reject(error);
         } else {
           if (result.rows.length > 0) {
-            console.log("result: ", result.rows);
+            // console.log("result: ", result.rows);
             resolve(result.rows[0].like_count);
           } else {
             resolve(0);
@@ -147,12 +137,96 @@ export const getLikeCount = (vid_id) => {
 };
 
 // api to add user like, user dislike and neither like neither dislike
-export const addUserLike = (body) => {
+export const addUserLike = async (body) => {
+  try {
+    const { userId, vid_id, action } = body;
+    if (action === "like") {
+      await pool.query(
+        "INSERT INTO user_likes (user_id, vid_id, action) VALUES ($1, $2, 'like')",
+        [userId, vid_id]
+      );
+    } else if (action === "unlike") {
+      await pool.query(
+        "UPDATE user_likes SET action = 'unlike' WHERE user_id = $1 AND vid_id = $2",
+        [userId, vid_id]
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// api to update user likes in ytvid table
+export const updateLikesInYtvidTable = (body) => {
+  return new Promise(function (resolve, reject) {
+    const { vid_id, action } = body;
+
+    if (action === "like") {
+      pool.query(
+        "UPDATE ytvid SET like_count = like_count - 1 WHERE vid_id = $1",
+        [vid_id],
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    } else if (action === "unlike") {
+      pool.query(
+        "UPDATE ytvid SET like_count = like_count + 1 WHERE vid_id = $1",
+        [vid_id],
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    } else {
+      reject(new Error("Invalid action"));
+    }
+  });
+};
+
+// api to check if the video is liked or not
+export const isLiked = (body) => {
   return new Promise(function (resolve, reject) {
     const { userId, vid_id } = body;
     pool.query(
-      "INSERT INTO user_likes (user_id, vid_id, isLike) VALUES ($1, $2, true)",
+      "SELECT action FROM user_likes WHERE user_id = $1 AND vid_id = $2",
       [userId, vid_id],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result.rows[0]);
+        }
+      }
+    );
+  });
+};
+// api to get all the liked videos
+export const getAllLikedVideos = () => {
+  return new Promise(function (resolve, reject) {
+    pool.query("SELECT vid_id FROM user_likes", (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result.rows);
+      }
+    });
+  });
+};
+
+export const getUpdateLikedVideo = (body) => {
+  return new Promise(function (resolve, reject) {
+    const { lastTimeStamp } = body;
+    pool.query(
+      "SELECT vid_id FROM user_likes WHERE created_at > $1",
+      [lastTimeStamp],
       (error, result) => {
         if (error) {
           reject(error);

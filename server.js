@@ -9,6 +9,10 @@ import {
   writeUserData,
   getLikeCount,
   addUserLike,
+  updateLikesInYtvidTable,
+  getAllLikedVideos,
+  getUpdateLikedVideo,
+  isLiked,
 } from "./router.js";
 import pkg from "pg";
 import "dotenv/config";
@@ -20,11 +24,6 @@ const app = express();
 const fetch = (...args) =>
   import(node - fetch).then(({ default: fetch }) => fetch(...args));
 
-// const corsOptions = {
-//   origin: "http://localhost:3000",
-//   credentials: true, //access-control-allow-credentials:true
-//   optionSuccessStatus: 200,
-// };
 app.use(
   cors({
     origin: "http://localhost:3000", // Allow requests from http://localhost:3000
@@ -44,17 +43,17 @@ app.use(function (req, res, next) {
   next();
 });
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
-  authDomain: "devlib-c6572.firebaseapp.com",
-  databaseURL:
-    "https://devlib-c6572-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "devlib-c6572",
-  storageBucket: "devlib-c6572.appspot.com",
-  messagingSenderId: "553953347527",
-  appId: "1:553953347527:web:2ebde7a35ff5917e2cbbe2",
-  measurementId: "G-CM76FGV328",
-};
+// const firebaseConfig = {
+//   apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
+//   authDomain: "devlib-c6572.firebaseapp.com",
+//   databaseURL:
+//     "https://devlib-c6572-default-rtdb.asia-southeast1.firebasedatabase.app",
+//   projectId: "devlib-c6572",
+//   storageBucket: "devlib-c6572.appspot.com",
+//   messagingSenderId: "553953347527",
+//   appId: "1:553953347527:web:2ebde7a35ff5917e2cbbe2",
+//   measurementId: "G-CM76FGV328",
+// };
 // connectionString: process.env.POSTGRES_URL,
 export const pool = new Pool({
   host: process.env.HOST,
@@ -64,10 +63,31 @@ export const pool = new Pool({
   port: process.env.DATABASE_PORT,
 });
 
-export const firebase = initializeApp(firebaseConfig);
+// export const firebase = initializeApp(firebaseConfig);
 
 app.get("/", (req, res) => {
   res.send("hello world");
+});
+
+app.get("/api/likedVideo", async (req, res) => {
+  try {
+    const response = await getAllLikedVideos();
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+    console.log(error);
+  }
+});
+
+app.get("/api/updatedLikeVideos", async (req, res) => {
+  const lastTimeStamp = req.body;
+  try {
+    const response = await getUpdateLikedVideo(lastTimeStamp);
+    res.status(200).send({ data: response });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 // app.get("/users", getUsers);
@@ -118,7 +138,7 @@ app.post("/get-like-count", async (req, res) => {
   try {
     const vidId = req.body.video_id;
     const rowCount = await getLikeCount(vidId);
-    console.log(rowCount);
+    // console.log(rowCount);
     res.status(200).send({ rowCount: rowCount });
   } catch (error) {
     console.log("Error updating like count: ", error);
@@ -126,13 +146,32 @@ app.post("/get-like-count", async (req, res) => {
   }
 });
 
-app.post("/add-like", async (req, res) => {
+app.post("/api/updateUserLikes", async (req, res) => {
   try {
     const response = await addUserLike(req.body);
     res.status(200).send({ data: response });
   } catch (error) {
     console.log("Error adding like, ", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/addLike", async (req, res) => {
+  try {
+    const response = await updateLikesInYtvidTable(req.body);
+    res.status(200).send({ data: response });
+  } catch (error) {
+    console.log("Error adding like, ", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/checkLike", async (req, res) => {
+  try {
+    const response = await isLiked(req.body);
+    res.status(200).send({ data: response });
+  } catch (error) {
+    console.log("unable to get check like status due to: " + error);
   }
 });
 
