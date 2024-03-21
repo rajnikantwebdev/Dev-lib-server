@@ -55,13 +55,17 @@ app.use(function (req, res, next) {
 //   measurementId: "G-CM76FGV328",
 // };
 // connectionString: process.env.POSTGRES_URL,
+// console.log("Connection Parameters:", {
+//   host: process.env.HOST,
+//   user: process.env.USER,
+//   database: process.env.DATABASE,
+//   password: process.env.DATABASE_PASSWORD,
+//   port: process.env.DATABASE_PORT,
+// });
+
 export const pool = new Pool({
-  // host: process.env.HOST,
-  // user: process.env.USER,
-  // database: process.env.DATABASE,
-  // password: process.env.DATABASE_PASSWORD,
-  // port: process.env.DATABASE_PORT,
-  connectionString: process.env.POSTGRES_URL,
+  connectionString:
+    "postgres://default:d8vZwTjxBAq5@ep-tight-credit-a12mr80v-pooler.ap-southeast-1.aws.neon.tech:5432/verceldb?sslmode=require",
 });
 
 // export const firebase = initializeApp(firebaseConfig);

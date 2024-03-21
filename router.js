@@ -23,6 +23,7 @@ export const writeUserData = (body) => {
       [userId, title, vid_id],
       (error, result) => {
         if (error) {
+          console.log(error);
           reject(error);
         }
         if (result && result.rows) {
