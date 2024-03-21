@@ -56,11 +56,12 @@ app.use(function (req, res, next) {
 // };
 // connectionString: process.env.POSTGRES_URL,
 export const pool = new Pool({
-  host: process.env.HOST,
-  user: process.env.USER,
-  database: process.env.DATABASE,
-  password: process.env.DATABASE_PASSWORD,
-  port: process.env.DATABASE_PORT,
+  // host: process.env.HOST,
+  // user: process.env.USER,
+  // database: process.env.DATABASE,
+  // password: process.env.DATABASE_PASSWORD,
+  // port: process.env.DATABASE_PORT,
+  connectionString: process.env.POSTGRES_URL,
 });
 
 // export const firebase = initializeApp(firebaseConfig);
