@@ -1,7 +1,6 @@
 import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { initializeApp } from "firebase/app";
 import {
   addVideoId,
   getAllVideoData,
@@ -14,6 +13,11 @@ import {
   getUpdateLikedVideo,
   isLiked,
 } from "./router.js";
+import {
+  addVideoIdInSavedPost,
+  checkIfVideoIdExists,
+  removeVideoIdFromSavedList,
+} from "./savedVideosRouter.js";
 import pkg from "pg";
 import "dotenv/config";
 
@@ -43,32 +47,10 @@ app.use(function (req, res, next) {
   next();
 });
 
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
-//   authDomain: "devlib-c6572.firebaseapp.com",
-//   databaseURL:
-//     "https://devlib-c6572-default-rtdb.asia-southeast1.firebasedatabase.app",
-//   projectId: "devlib-c6572",
-//   storageBucket: "devlib-c6572.appspot.com",
-//   messagingSenderId: "553953347527",
-//   appId: "1:553953347527:web:2ebde7a35ff5917e2cbbe2",
-//   measurementId: "G-CM76FGV328",
-// };
-// connectionString: process.env.POSTGRES_URL,
-// console.log("Connection Parameters:", {
-//   host: process.env.HOST,
-//   user: process.env.USER,
-//   database: process.env.DATABASE,
-//   password: process.env.DATABASE_PASSWORD,
-//   port: process.env.DATABASE_PORT,
-// });
-
 export const pool = new Pool({
   connectionString:
     "postgres://default:d8vZwTjxBAq5@ep-tight-credit-a12mr80v-pooler.ap-southeast-1.aws.neon.tech:5432/verceldb?sslmode=require",
 });
-
-// export const firebase = initializeApp(firebaseConfig);
 
 app.get("/", (req, res) => {
   res.send("hello world");
@@ -88,14 +70,44 @@ app.get("/api/updatedLikeVideos", async (req, res) => {
   const lastTimeStamp = req.body;
   try {
     const response = await getUpdateLikedVideo(lastTimeStamp);
-    res.status(200).send({ data: response });
+    res.status(200).json({ data: response });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-// app.get("/users", getUsers);
+app.post("/api/updateSavedPost", async (req, res) => {
+  try {
+    const response = await addVideoIdInSavedPost(req.body);
+    res.status(200).send({ data: response });
+  } catch (error) {
+    // console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/checkIfVideoIdExists", async (req, res) => {
+  try {
+    console.log(req.body);
+    const ifVideoIdExistsResponse = await checkIfVideoIdExists(req.body);
+    res.status(200).json({ data: ifVideoIdExistsResponse });
+  } catch (error) {
+    // console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/removeVideoFromSavedVideos", async (req, res) => {
+  try {
+    console.log(req.body);
+    const removeVideoResponse = await removeVideoIdFromSavedList(req.body);
+    res.status(200).json({ data: removeVideoResponse });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 app.post("/adduser", (req, res) => {
   addUserId(req.body)

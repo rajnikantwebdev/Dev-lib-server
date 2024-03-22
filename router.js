@@ -80,22 +80,6 @@ export const addUserId = (body) => {
   });
 };
 
-// export const increaseLikeCount = (id) => {
-//   return new Promise(function (resolve, reject) {
-//     pool.query(
-//       "UPDATE ytvid SET like_count = like_count + 1 WHERE vid_id = $1",
-//       [id],
-//       (error, result) => {
-//         if (error) {
-//           reject(error);
-//         } else {
-//           resolve(result.rowCount);
-//         }
-//       }
-//     );
-//   });
-// };
-
 // api to add increase like count of a particular video
 export const addVideoId = (body) => {
   return new Promise(function (resolve, reject) {
