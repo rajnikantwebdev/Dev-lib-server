@@ -17,6 +17,7 @@ import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
   removeVideoIdFromSavedList,
+  getAllSavedVideos,
 } from "./savedVideosRouter.js";
 import pkg from "pg";
 import "dotenv/config";
@@ -103,6 +104,16 @@ app.post("/api/removeVideoFromSavedVideos", async (req, res) => {
     console.log(req.body);
     const removeVideoResponse = await removeVideoIdFromSavedList(req.body);
     res.status(200).json({ data: removeVideoResponse });
+  } catch (error) {
+    // console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/getAllSavedVideos", async (req, res) => {
+  try {
+    const getAllSavedVideosResponse = await getAllSavedVideos(req.body);
+    res.status(200).json({ data: getAllSavedVideosResponse });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });

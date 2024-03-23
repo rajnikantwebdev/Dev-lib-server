@@ -53,3 +53,20 @@ export const removeVideoIdFromSavedList = (body) => {
     );
   });
 };
+
+export const getAllSavedVideos = (body) => {
+  return new Promise((resolve, reject) => {
+    const { userId } = body;
+    pool.query(
+      "SELECT * FROM users WHERE user_id = $1",
+      [userId],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result.rows[0].saved_videos);
+        }
+      }
+    );
+  });
+};
