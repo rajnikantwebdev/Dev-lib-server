@@ -1,14 +1,32 @@
 import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { initializeApp } from "firebase/app";
 import {
-  increaseLikeCount,
+  addVideoId,
   getAllVideoData,
   addUserId,
   writeUserData,
   getLikeCount,
+  updateLikesInYtvidTable,
+  getUpdateLikedVideo,
+  isLiked,
 } from "./router.js";
+import {
+  addVideoIdInSavedPost,
+  checkIfVideoIdExists,
+  removeVideoIdFromSavedList,
+  getAllSavedVideos,
+} from "./savedVideosRouter.js";
+
+import {
+  addUserLike,
+  removeUserLikedVideo,
+  getAllLikedVideos,
+  checkIfLikedVideoExists,
+  incrementLikeCount,
+  decrementLikeCount,
+} from "./likeVideosRouter.js";
+
 import pkg from "pg";
 import "dotenv/config";
 
@@ -23,11 +41,6 @@ const app = express();
 const fetch = (...args) =>
   import(node - fetch).then(({ default: fetch }) => fetch(...args));
 
-// const corsOptions = {
-//   origin: "http://localhost:3000",
-//   credentials: true, //access-control-allow-credentials:true
-//   optionSuccessStatus: 200,
-// };
 app.use(
   cors({
     origin: "http://localhost:3000", // Allow requests from http://localhost:3000
@@ -54,38 +67,77 @@ app.use(function (req, res, next) {
   next();
 });
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDBt60YVWPEvQGMvOTCfyJAuJY0_hU4XRA",
-  authDomain: "devlib-c6572.firebaseapp.com",
-  databaseURL:
-    "https://devlib-c6572-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "devlib-c6572",
-  storageBucket: "devlib-c6572.appspot.com",
-  messagingSenderId: "553953347527",
-  appId: "1:553953347527:web:2ebde7a35ff5917e2cbbe2",
-  measurementId: "G-CM76FGV328",
-};
-// connectionString: process.env.POSTGRES_URL,
-
-
-// export const pool = new Pool({
-//   connectionString: connectionString,
-// });
-// export const pool = new Pool({
-//   host: process.env.HOST,
-//   user: process.env.USER,
-//   database: process.env.DATABASE,
-//   password: process.env.DATABASE_PASSWORD,
-//   port: process.env.DATABASE_PORT,
-// });
-
-export const firebase = initializeApp(firebaseConfig);
+export const pool = new Pool({
+  connectionString:
+    "postgres://default:d8vZwTjxBAq5@ep-tight-credit-a12mr80v-pooler.ap-southeast-1.aws.neon.tech:5432/verceldb?sslmode=require",
+});
 
 app.get("/", (req, res) => {
   res.send("hello world");
 });
 
-// app.get("/users", getUsers);
+app.get("/api/likedVideo", async (req, res) => {
+  try {
+    const response = await getAllLikedVideos();
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+    console.log(error);
+  }
+});
+
+app.get("/api/updatedLikeVideos", async (req, res) => {
+  const lastTimeStamp = req.body;
+  try {
+    const response = await getUpdateLikedVideo(lastTimeStamp);
+    res.status(200).json({ data: response });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/api/updateSavedPost", async (req, res) => {
+  try {
+    const response = await addVideoIdInSavedPost(req.body);
+    res.status(200).send({ data: response });
+  } catch (error) {
+    // console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/checkIfVideoIdExists", async (req, res) => {
+  try {
+    console.log(req.body);
+    const ifVideoIdExistsResponse = await checkIfVideoIdExists(req.body);
+    res.status(200).json({ data: ifVideoIdExistsResponse });
+  } catch (error) {
+    // console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/removeVideoFromSavedVideos", async (req, res) => {
+  try {
+    console.log(req.body);
+    const removeVideoResponse = await removeVideoIdFromSavedList(req.body);
+    res.status(200).json({ data: removeVideoResponse });
+  } catch (error) {
+    // console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/getAllSavedVideos", async (req, res) => {
+  try {
+    const getAllSavedVideosResponse = await getAllSavedVideos(req.body);
+    res.status(200).json({ data: getAllSavedVideosResponse });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 app.post("/adduser", (req, res) => {
   addUserId(req.body)
@@ -120,28 +172,72 @@ app.get("/get-yt-vid", (req, res) => {
     });
 });
 
-app.post("/vid/increment-like-count", async (req, res) => {
+app.post("/api/addVideoId", async (req, res) => {
   try {
-    const vidId = req.body.video_id;
-    const rowCount = await increaseLikeCount(vidId);
+    const response = await addVideoId(req.body);
+    res.status(200).send({ data: response });
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
 
-    res
-      .status(200)
-      .json({ message: `Like count updated for post ${vidId}`, rowCount });
+app.post("/api/getAllLikedVideos", async (req, res) => {
+  try {
+    const getAllLikedVideosResponse = await getAllLikedVideos(req.body);
+    res.status(200).json({ data: getAllLikedVideosResponse });
   } catch (error) {
     console.log("Error updating like count: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.post("/get-like-count", async (req, res) => {
+app.post("/api/removeUserLikedVideo", async (req, res) => {
   try {
-    const vidId = req.body.video_id;
-    const rowCount = await getLikeCount(vidId);
-    console.log(rowCount);
-    res.status(200).send({ rowCount: rowCount });
+    const removeUserLikedVideoResponse = await removeUserLikedVideo(req.body);
+    res.status(200).json({ data: removeUserLikedVideoResponse });
   } catch (error) {
-    console.log("Error updating like count: ", error);
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/addLike", async (req, res) => {
+  try {
+    const addLikeResponse = await addUserLike(req.body);
+    res.status(200).json({ data: addLikeResponse });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/checkIfLikeExists", async (req, res) => {
+  try {
+    const checkIfLikedVideoExistsResponse = await checkIfLikedVideoExists(
+      req.body
+    );
+    res.status(200).send({ data: checkIfLikedVideoExistsResponse });
+  } catch (error) {
+    console.log("unable to get check like status due to: " + error);
+  }
+});
+
+app.post("/api/incrementLikeCount", async (req, res) => {
+  try {
+    const incrementLikeCountResponse = await incrementLikeCount(req.body);
+    res.status(200).json({ data: incrementLikeCountResponse });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/decrementLikeCount", async (req, res) => {
+  try {
+    const decrementLikeCountResponse = await decrementLikeCount(req.body);
+    res.status(200).json({ data: decrementLikeCountResponse });
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

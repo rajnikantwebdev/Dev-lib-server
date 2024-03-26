@@ -1,51 +1,4 @@
-import {
-  getDatabase,
-  set,
-  ref,
-  onValue,
-  get,
-  child,
-  push,
-} from "firebase/database";
-
-import pkg from "pg";
-
-
-const {Pool} =pkg
-
-
-import { firebase } from "./server.js";
-
-
-const connection = 'postgresql://rajni:rajnidatabase@192.168.87.232/api';
-
-console.log(connection)
-
-
-export const pool = new Pool({
-  connectionString: connection,
-});
-
-
-// Connect to the database using the pool
-pool.connect()
-  .then(client => {
-    console.log('Connected to PostgreSQL database');
-    // Now you can execute queries
-    // For example:
-    return client.query('SELECT * FROM your_table')
-      .then(result => {
-        console.log('Query result:', result.rows);
-        client.release(); // Release the client back to the pool
-      })
-      .catch(err => {
-        console.error('Error executing query:', err);
-        client.release(); // Release the client back to the pool
-      });
-  })
-  .catch(err => {
-    console.error('Error connecting to PostgreSQL:', err);
-  });
+import { pool } from "./server.js";
 
 export const getUsers = (request, response) => {
   pool.query("SELECT * FROM youtubevideos ORDER BY id ASC", (err, res) => {
@@ -72,7 +25,7 @@ export const writeUserData = (body) => {
       [userId, title, vid_id],
       (error, result) => {
         if (error) {
-          console.log(error)
+          console.log(error);
           reject(error);
         }
         if (result && result.rows) {
@@ -129,25 +82,26 @@ export const addUserId = (body) => {
   });
 };
 
-export const increaseLikeCount = (id) => {
+// api to add increase like count of a particular video
+export const addVideoId = (body) => {
   return new Promise(function (resolve, reject) {
+    const { vid_id } = body;
+    console.log(vid_id);
     pool.query(
-      "UPDATE ytvid SET like_count = like_count + 1 WHERE vid_id = $1",
-      [id],
+      "INSERT INTO total_likes (vid_id, likes_count) VALUES($1, 0)",
+      [vid_id],
       (error, result) => {
         if (error) {
           reject(error);
         } else {
-          resolve(result.rowCount);
+          resolve(result);
         }
       }
     );
   });
 };
 
-
-
-
+// api to get like count of a particular video
 export const getLikeCount = (vid_id) => {
   return new Promise(function (resolve, reject) {
     pool.query(
@@ -158,11 +112,113 @@ export const getLikeCount = (vid_id) => {
           reject(error);
         } else {
           if (result.rows.length > 0) {
-            console.log("result: ", result.rows);
+            // console.log("result: ", result.rows);
             resolve(result.rows[0].like_count);
           } else {
             resolve(0);
           }
+        }
+      }
+    );
+  });
+};
+
+// api to add user like, user dislike and neither like neither dislike
+export const addUserLike = async (body) => {
+  try {
+    const { userId, vid_id, action } = body;
+    if (action === "like") {
+      await pool.query(
+        "INSERT INTO user_likes (user_id, vid_id, action) VALUES ($1, $2, 'like')",
+        [userId, vid_id]
+      );
+    } else if (action === "unlike") {
+      await pool.query(
+        "UPDATE user_likes SET action = 'unlike' WHERE user_id = $1 AND vid_id = $2",
+        [userId, vid_id]
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// api to update user likes in ytvid table
+export const updateLikesInYtvidTable = (body) => {
+  return new Promise(function (resolve, reject) {
+    const { vid_id, action } = body;
+
+    if (action === "like") {
+      pool.query(
+        "UPDATE ytvid SET like_count = like_count - 1 WHERE vid_id = $1",
+        [vid_id],
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    } else if (action === "unlike") {
+      pool.query(
+        "UPDATE ytvid SET like_count = like_count + 1 WHERE vid_id = $1",
+        [vid_id],
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    } else {
+      reject(new Error("Invalid action"));
+    }
+  });
+};
+
+// api to check if the video is liked or not
+export const isLiked = (body) => {
+  return new Promise(function (resolve, reject) {
+    const { userId, vid_id } = body;
+    pool.query(
+      "SELECT action FROM user_likes WHERE user_id = $1 AND vid_id = $2",
+      [userId, vid_id],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result.rows[0]);
+        }
+      }
+    );
+  });
+};
+// api to get all the liked videos
+export const getAllLikedVideos = () => {
+  return new Promise(function (resolve, reject) {
+    pool.query("SELECT vid_id FROM user_likes", (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result.rows);
+      }
+    });
+  });
+};
+
+export const getUpdateLikedVideo = (body) => {
+  return new Promise(function (resolve, reject) {
+    const { lastTimeStamp } = body;
+    pool.query(
+      "SELECT vid_id FROM user_likes WHERE created_at > $1",
+      [lastTimeStamp],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
         }
       }
     );
