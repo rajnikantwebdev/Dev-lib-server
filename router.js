@@ -8,8 +8,44 @@ import {
   push,
 } from "firebase/database";
 
+import pkg from "pg";
 
-import { firebase, pool } from "./server.js";
+
+const {Pool} =pkg
+
+
+import { firebase } from "./server.js";
+
+
+const connection = 'postgresql://rajni:rajnidatabase@192.168.87.232/api';
+
+console.log(connection)
+
+
+export const pool = new Pool({
+  connectionString: connection,
+});
+
+
+// Connect to the database using the pool
+pool.connect()
+  .then(client => {
+    console.log('Connected to PostgreSQL database');
+    // Now you can execute queries
+    // For example:
+    return client.query('SELECT * FROM your_table')
+      .then(result => {
+        console.log('Query result:', result.rows);
+        client.release(); // Release the client back to the pool
+      })
+      .catch(err => {
+        console.error('Error executing query:', err);
+        client.release(); // Release the client back to the pool
+      });
+  })
+  .catch(err => {
+    console.error('Error connecting to PostgreSQL:', err);
+  });
 
 export const getUsers = (request, response) => {
   pool.query("SELECT * FROM youtubevideos ORDER BY id ASC", (err, res) => {
@@ -19,6 +55,8 @@ export const getUsers = (request, response) => {
     response.status(200).json(res.rows);
   });
 };
+
+
 
 // api so that user can upload youtube video
 export const writeUserData = (body) => {
@@ -34,6 +72,7 @@ export const writeUserData = (body) => {
       [userId, title, vid_id],
       (error, result) => {
         if (error) {
+          console.log(error)
           reject(error);
         }
         if (result && result.rows) {
@@ -105,6 +144,9 @@ export const increaseLikeCount = (id) => {
     );
   });
 };
+
+
+
 
 export const getLikeCount = (vid_id) => {
   return new Promise(function (resolve, reject) {

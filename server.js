@@ -12,6 +12,10 @@ import {
 import pkg from "pg";
 import "dotenv/config";
 
+import Client from "pg";
+
+
+
 const { Pool } = pkg;
 const router = express.Router();
 const app = express();
@@ -30,6 +34,13 @@ app.use(
     credentials: true,
   })
 );
+
+
+
+
+
+
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -55,13 +66,18 @@ const firebaseConfig = {
   measurementId: "G-CM76FGV328",
 };
 // connectionString: process.env.POSTGRES_URL,
-export const pool = new Pool({
-  host: process.env.HOST,
-  user: process.env.USER,
-  database: process.env.DATABASE,
-  password: process.env.DATABASE_PASSWORD,
-  port: process.env.DATABASE_PORT,
-});
+
+
+// export const pool = new Pool({
+//   connectionString: connectionString,
+// });
+// export const pool = new Pool({
+//   host: process.env.HOST,
+//   user: process.env.USER,
+//   database: process.env.DATABASE,
+//   password: process.env.DATABASE_PASSWORD,
+//   port: process.env.DATABASE_PORT,
+// });
 
 export const firebase = initializeApp(firebaseConfig);
 
