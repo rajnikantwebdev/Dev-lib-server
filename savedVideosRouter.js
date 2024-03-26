@@ -23,7 +23,7 @@ export const checkIfVideoIdExists = (body) => {
   return new Promise((resolve, reject) => {
     const { userId, vid_id } = body;
     pool.query(
-      "SELECT * FROM users WHERE $2 = ANY(saved_videos) AND user_id = $1",
+      "SELECT saved_videos FROM users WHERE $2 = ANY(saved_videos) AND user_id = $1",
       [userId, vid_id],
       (error, result) => {
         if (error) {
@@ -58,7 +58,7 @@ export const getAllSavedVideos = (body) => {
   return new Promise((resolve, reject) => {
     const { userId } = body;
     pool.query(
-      "SELECT * FROM users WHERE user_id = $1",
+      "SELECT saved_videos FROM users WHERE user_id = $1",
       [userId],
       (error, result) => {
         if (error) {

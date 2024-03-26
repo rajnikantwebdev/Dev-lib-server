@@ -7,9 +7,7 @@ import {
   addUserId,
   writeUserData,
   getLikeCount,
-  addUserLike,
   updateLikesInYtvidTable,
-  getAllLikedVideos,
   getUpdateLikedVideo,
   isLiked,
 } from "./router.js";
@@ -19,6 +17,16 @@ import {
   removeVideoIdFromSavedList,
   getAllSavedVideos,
 } from "./savedVideosRouter.js";
+
+import {
+  addUserLike,
+  removeUserLikedVideo,
+  getAllLikedVideos,
+  checkIfLikedVideoExists,
+  incrementLikeCount,
+  decrementLikeCount,
+} from "./likeVideosRouter.js";
+
 import pkg from "pg";
 import "dotenv/config";
 
@@ -162,44 +170,64 @@ app.post("/api/addVideoId", async (req, res) => {
   }
 });
 
-app.post("/get-like-count", async (req, res) => {
+app.post("/api/getAllLikedVideos", async (req, res) => {
   try {
-    const vidId = req.body.video_id;
-    const rowCount = await getLikeCount(vidId);
-    // console.log(rowCount);
-    res.status(200).send({ rowCount: rowCount });
+    const getAllLikedVideosResponse = await getAllLikedVideos(req.body);
+    res.status(200).json({ data: getAllLikedVideosResponse });
   } catch (error) {
     console.log("Error updating like count: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.post("/api/updateUserLikes", async (req, res) => {
+app.post("/api/removeUserLikedVideo", async (req, res) => {
   try {
-    const response = await addUserLike(req.body);
-    res.status(200).send({ data: response });
+    const removeUserLikedVideoResponse = await removeUserLikedVideo(req.body);
+    res.status(200).json({ data: removeUserLikedVideoResponse });
   } catch (error) {
-    console.log("Error adding like, ", error);
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.post("/addLike", async (req, res) => {
+app.post("/api/addLike", async (req, res) => {
   try {
-    const response = await updateLikesInYtvidTable(req.body);
-    res.status(200).send({ data: response });
+    const addLikeResponse = await addUserLike(req.body);
+    res.status(200).json({ data: addLikeResponse });
   } catch (error) {
-    console.log("Error adding like, ", error);
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.post("/api/checkLike", async (req, res) => {
+app.post("/api/checkIfLikeExists", async (req, res) => {
   try {
-    const response = await isLiked(req.body);
-    res.status(200).send({ data: response });
+    const checkIfLikedVideoExistsResponse = await checkIfLikedVideoExists(
+      req.body
+    );
+    res.status(200).send({ data: checkIfLikedVideoExistsResponse });
   } catch (error) {
     console.log("unable to get check like status due to: " + error);
+  }
+});
+
+app.post("/api/incrementLikeCount", async (req, res) => {
+  try {
+    const incrementLikeCountResponse = await incrementLikeCount(req.body);
+    res.status(200).json({ data: incrementLikeCountResponse });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/decrementLikeCount", async (req, res) => {
+  try {
+    const decrementLikeCountResponse = await decrementLikeCount(req.body);
+    res.status(200).json({ data: decrementLikeCountResponse });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
