@@ -27,6 +27,9 @@ import {
   decrementLikeCount,
 } from "./likeVideosRouter.js";
 
+
+import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
+
 import pkg from "pg";
 import "dotenv/config";
 
@@ -230,6 +233,26 @@ app.post("/api/decrementLikeCount", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
+app.get("/get-userDeta", async(req, res) => {
+
+  try{
+    const userId = req.query.user_id;
+    console.log(userId)
+    getUserDetailsForUserPage(userId)
+    .then((response) => {
+      console.log("response: ", response);
+      res.status(200).send(response);
+    })
+  }catch(error){
+    console.log(error)
+    res.status(500).json({ error: error});
+  }
+});
+
+
+
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");
