@@ -1,16 +1,7 @@
 import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import {
-  addVideoId,
-  getAllVideoData,
-  addUserId,
-  writeUserData,
-  getLikeCount,
-  updateLikesInYtvidTable,
-  getUpdateLikedVideo,
-  isLiked,
-} from "./router.js";
+import { getAllVideoData, addUserId, writeUserData } from "./router.js";
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
@@ -26,7 +17,6 @@ import {
   incrementLikeCount,
   decrementLikeCount,
 } from "./likeVideosRouter.js";
-
 
 import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
 
@@ -234,25 +224,19 @@ app.post("/api/decrementLikeCount", async (req, res) => {
   }
 });
 
-
-app.get("/get-userDeta", async(req, res) => {
-
-  try{
+app.get("/get-userDeta", async (req, res) => {
+  try {
     const userId = req.query.user_id;
-    console.log(userId)
-    getUserDetailsForUserPage(userId)
-    .then((response) => {
+    console.log(userId);
+    getUserDetailsForUserPage(userId).then((response) => {
       console.log("response: ", response);
       res.status(200).send(response);
-    })
-  }catch(error){
-    console.log(error)
-    res.status(500).json({ error: error});
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error });
   }
 });
-
-
-
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");

@@ -14,10 +14,6 @@ export const writeUserData = (body) => {
   return new Promise(function (resolve, reject) {
     const { userId, title, vid_id } = body;
 
-    // const dataObj = { youtubeVideoId, tags };
-    // const jsonData = JSON.stringify(dataObj);
-    // const yt_vid_data = [jsonData];
-    // console.log("userId: ", userId);
     pool.query(
       "INSERT INTO ytvid (user_id, title, vid_id, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING *",
       [userId, title, vid_id],
