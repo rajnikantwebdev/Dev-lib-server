@@ -28,7 +28,7 @@ import {
 } from "./likeVideosRouter.js";
 
 
-import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
+import { getUserDetailsForUserPage, userValues } from "./allUserRelatedTransactions.js";
 
 import pkg from "pg";
 import "dotenv/config";
@@ -263,6 +263,34 @@ app.get("/get-userDeta", async(req, res) => {
 });
 
 
+app.get("/get-searchData", async(req, res) => {
+
+  try{
+    console.log(req)
+    const name=req.query.name;
+    console.log(name)
+    getUserDetailsForUserPage(name)
+    .then((response) => {
+      console.log("response: ", response);
+      res.status(200).send(response);
+    })
+  }catch(error){
+    console.log(error)
+    res.status(500).json({ error: error});
+  }
+});
+
+app.get("/get-userData",
+async(req,res)=>{
+
+  try{
+    const words=req.query.searchedWords;
+    console.log("hello")
+    userValues(words).then((value)=>res.status(200).send(value))
+  }catch(error){
+    res.status(500).json({error:error})
+  }
+})
 
 
 app.listen(process.env.PORT, function () {
