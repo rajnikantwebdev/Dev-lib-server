@@ -1,16 +1,7 @@
 import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import {
-  addVideoId,
-  getAllVideoData,
-  addUserId,
-  writeUserData,
-  getLikeCount,
-  updateLikesInYtvidTable,
-  getUpdateLikedVideo,
-  isLiked,
-} from "./router.js";
+import { getAllVideoData, addUserId, writeUserData } from "./router.js";
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
@@ -29,13 +20,11 @@ import {
 
 
 import { getUserDetailsForUserPage, userValues } from "./allUserRelatedTransactions.js";
+import getUserPostCountApi from "./userDetailsFunction.js";
+import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
 
 import pkg from "pg";
 import "dotenv/config";
-
-import Client from "pg";
-
-
 
 const { Pool } = pkg;
 const router = express.Router();
@@ -50,13 +39,6 @@ app.use(
     credentials: true,
   })
 );
-
-
-
-
-
-
-
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -73,6 +55,16 @@ app.use(function (req, res, next) {
 export const pool = new Pool({
   connectionString:
     "postgres://default:d8vZwTjxBAq5@ep-tight-credit-a12mr80v-pooler.ap-southeast-1.aws.neon.tech:5432/verceldb?sslmode=require",
+});
+
+app.post("/api/user/post-count", async (req, res) => {
+  try {
+    const response = await getUserPostCountApi(req.body);
+    res.status(200).json({ data: response });
+  } catch (error) {
+    console.log("error while getting post count: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 app.get("/", (req, res) => {
@@ -245,53 +237,19 @@ app.post("/api/decrementLikeCount", async (req, res) => {
   }
 });
 
-
-app.get("/get-userDeta", async(req, res) => {
-
-  try{
+app.get("/get-userDeta", async (req, res) => {
+  try {
     const userId = req.query.user_id;
-    console.log(userId)
-    getUserDetailsForUserPage(userId)
-    .then((response) => {
+    console.log(userId);
+    getUserDetailsForUserPage(userId).then((response) => {
       console.log("response: ", response);
       res.status(200).send(response);
-    })
-  }catch(error){
-    console.log(error)
-    res.status(500).json({ error: error});
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error });
   }
 });
-
-
-app.get("/get-searchData", async(req, res) => {
-
-  try{
-    console.log(req)
-    const name=req.query.name;
-    console.log(name)
-    getUserDetailsForUserPage(name)
-    .then((response) => {
-      console.log("response: ", response);
-      res.status(200).send(response);
-    })
-  }catch(error){
-    console.log(error)
-    res.status(500).json({ error: error});
-  }
-});
-
-app.get("/get-userData",
-async(req,res)=>{
-
-  try{
-    const words=req.query.searchedWords;
-    console.log("hello")
-    userValues(words).then((value)=>res.status(200).send(value))
-  }catch(error){
-    res.status(500).json({error:error})
-  }
-})
-
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");
