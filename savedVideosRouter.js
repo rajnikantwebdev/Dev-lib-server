@@ -18,6 +18,9 @@ export const addVideoIdInSavedPost = (body) => {
   });
 };
 
+
+
+
 // api to check if the video id already exists in the array or not
 export const checkIfVideoIdExists = (body) => {
   return new Promise((resolve, reject) => {
@@ -35,6 +38,8 @@ export const checkIfVideoIdExists = (body) => {
     );
   });
 };
+
+
 
 // api to remove video id from the saved list
 export const removeVideoIdFromSavedList = (body) => {
@@ -54,6 +59,8 @@ export const removeVideoIdFromSavedList = (body) => {
   });
 };
 
+
+
 export const getAllSavedVideos = (body) => {
   return new Promise((resolve, reject) => {
     const { userId } = body;
@@ -64,7 +71,7 @@ export const getAllSavedVideos = (body) => {
         if (error) {
           reject(error);
         } else {
-          resolve(result.rows[0].saved_videos);
+          resolve(result.rows[0]?.saved_videos);
         }
       }
     );

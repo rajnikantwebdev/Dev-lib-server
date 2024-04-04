@@ -46,6 +46,7 @@ export const getAllLikedVideos = (body) => {
         if (error) {
           reject(error);
         } else {
+          console.log("result rows",result.rows[0])
           resolve(result.rows[0]);
         }
       }

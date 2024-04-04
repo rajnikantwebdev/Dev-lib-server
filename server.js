@@ -21,7 +21,7 @@ import {
 
 import { getUserDetailsForUserPage, userValues } from "./allUserRelatedTransactions.js";
 import getUserPostCountApi from "./userDetailsFunction.js";
-import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
+// import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
 
 import pkg from "pg";
 import "dotenv/config";
@@ -178,6 +178,7 @@ app.post("/api/addVideoId", async (req, res) => {
 
 app.post("/api/getAllLikedVideos", async (req, res) => {
   try {
+    console.log(req.body)
     const getAllLikedVideosResponse = await getAllLikedVideos(req.body);
     res.status(200).json({ data: getAllLikedVideosResponse });
   } catch (error) {
