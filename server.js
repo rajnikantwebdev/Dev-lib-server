@@ -19,9 +19,7 @@ import {
 } from "./likeVideosRouter.js";
 
 
-import { getUserDetailsForUserPage, userValues } from "./allUserRelatedTransactions.js";
-import getUserPostCountApi from "./userDetailsFunction.js";
-// import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
+import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
 
 import pkg from "pg";
 import "dotenv/config";
@@ -251,6 +249,9 @@ app.get("/get-userDeta", async (req, res) => {
     res.status(500).json({ error: error });
   }
 });
+
+
+
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");
