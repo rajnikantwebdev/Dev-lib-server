@@ -18,7 +18,6 @@ import {
   decrementLikeCount,
 } from "./likeVideosRouter.js";
 
-
 import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
 
 import pkg from "pg";
@@ -53,16 +52,6 @@ app.use(function (req, res, next) {
 export const pool = new Pool({
   connectionString:
     "postgres://default:d8vZwTjxBAq5@ep-tight-credit-a12mr80v-pooler.ap-southeast-1.aws.neon.tech:5432/verceldb?sslmode=require",
-});
-
-app.post("/api/user/post-count", async (req, res) => {
-  try {
-    const response = await getUserPostCountApi(req.body);
-    res.status(200).json({ data: response });
-  } catch (error) {
-    console.log("error while getting post count: ", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
 });
 
 app.get("/", (req, res) => {
