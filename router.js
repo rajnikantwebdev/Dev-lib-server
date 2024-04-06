@@ -54,24 +54,4 @@ export const getAllVideoData = () => {
   });
 };
 
-export const addUserId = (body) => {
-  return new Promise(function (resolve, reject) {
-    const { userId } = body;
-    pool.query(
-      "INSERT INTO users (user_id) VALUES($1) RETURNING *",
-      [userId],
-      (error, result) => {
-        if (error) {
-          reject(error);
-        }
-        if (result && result.rows) {
-          resolve(
-            `A new userId has been added: ${JSON.stringify(result.rows[0])}`
-          );
-        } else {
-          reject(new Error("No results found"));
-        }
-      }
-    );
-  });
-};
+
