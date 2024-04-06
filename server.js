@@ -1,7 +1,7 @@
 import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { getAllVideoData, addUserId, writeUserData } from "./router.js";
+import { getAllVideoData, writeUserData } from "./router.js";
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
@@ -18,10 +18,22 @@ import {
   decrementLikeCount,
 } from "./likeVideosRouter.js";
 
-import { getUserDetailsForUserPage } from "./allUserRelatedTransactions.js";
+import {
+  checkUserExistence,
+  getUserDetailsForUserPage,
+  searchUserValues,
+  addUserIdToUsersTable,
+  createUserBukcet,
+} from "./allUserRelatedTransactions.js";
 
+
+
+
+
+import { handlePostPromise } from "./skeltonFunctions.js";
 import pkg from "pg";
 import "dotenv/config";
+
 
 const { Pool } = pkg;
 const router = express.Router();
@@ -121,15 +133,7 @@ app.post("/api/getAllSavedVideos", async (req, res) => {
   }
 });
 
-app.post("/adduser", (req, res) => {
-  addUserId(req.body)
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
+
 
 // add youtube video in the database
 app.post("/add-yt-vid", (req, res) => {
@@ -165,7 +169,7 @@ app.post("/api/addVideoId", async (req, res) => {
 
 app.post("/api/getAllLikedVideos", async (req, res) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     const getAllLikedVideosResponse = await getAllLikedVideos(req.body);
     res.status(200).json({ data: getAllLikedVideosResponse });
   } catch (error) {
@@ -239,11 +243,57 @@ app.get("/get-userDeta", async (req, res) => {
   }
 });
 
-
-
+app.get("/get-userDeta", async (req, res) => {
+  try {
+    const userId = req.query.user_id;
+    console.log(userId);
+    getUserDetailsForUserPage(userId).then((response) => {
+      console.log("response: ", response);
+      res.status(200).send(response);
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error });
+  }
+});
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");
 });
 
 export default app;
+
+
+
+
+
+
+
+
+app.post("/adduser", (req, res) => {
+  handlePostPromise(addUserDetails(req.body), res);
+});
+
+
+
+
+app.post("/checkUserExist", (req, res) => {
+  console.log(req.body);
+  handlePostPromise(checkUserExistence(req.body), res);
+});
+
+app.post("/addUserVideoBucket", (req, res) => {
+  console.log(req.body);
+  handlePostPromise(createUserBukcet(req.body), res);
+});
+
+app.get("/searchUsers", (req, res) => {
+  console.log(req.query.searchedWords)
+  handlePostPromise(searchUserValues(req.query.searchedWords), res);
+});
+
+
+app.post("/adduser", (req, res) => {
+  
+  handlePostPromise(addUserIdToUsersTable(req.body),res)
+});
