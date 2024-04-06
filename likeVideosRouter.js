@@ -5,7 +5,7 @@ export const addUserLike = (body) => {
   return new Promise((resolve, reject) => {
     const { userId, vid_id } = body;
     pool.query(
-      "UPDATE users SET liked_videos = array_append(liked_videos, $2) WHERE user_id = $1",
+      "UPDATE video_bucket SET liked_videos = array_append(liked_videos, $2) WHERE uid = $1",
       [userId, vid_id],
       (error, result) => {
         if (error) {
@@ -40,7 +40,7 @@ export const getAllLikedVideos = (body) => {
   return new Promise((resolve, reject) => {
     const { userId } = body;
     pool.query(
-      "SELECT liked_videos FROM users WHERE user_id = $1",
+      "SELECT liked_videos FROM video_bucket WHERE uid = $1",
       [userId],
       (error, result) => {
         if (error) {
