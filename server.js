@@ -8,6 +8,7 @@ import {
   removeVideoIdFromSavedList,
   getAllSavedVideos,
 } from "./savedVideosRouter.js";
+import { addArticle } from "./articlesRouter.js";
 
 import {
   addUserLike,
@@ -56,6 +57,16 @@ export const pool = new Pool({
 
 app.get("/", (req, res) => {
   res.send("hello world");
+});
+
+app.post("/api/addNewArticle", async (req, res) => {
+  try {
+    const response = addArticle(req.body);
+    res.status(200).json({ data: response });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+    console.log("error while adding new article in bucket: ", error);
+  }
 });
 
 app.get("/api/likedVideo", async (req, res) => {
@@ -165,7 +176,7 @@ app.post("/api/addVideoId", async (req, res) => {
 
 app.post("/api/getAllLikedVideos", async (req, res) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     const getAllLikedVideosResponse = await getAllLikedVideos(req.body);
     res.status(200).json({ data: getAllLikedVideosResponse });
   } catch (error) {
@@ -238,9 +249,6 @@ app.get("/get-userDeta", async (req, res) => {
     res.status(500).json({ error: error });
   }
 });
-
-
-
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");
