@@ -38,12 +38,15 @@ export const addArticle = (body) => {
 
 export const getAllArticles = () => {
   return new Promise((resolve, reject) => {
-    pool.query("SELECT * FROM article_bucket", (error, result) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result);
+    pool.query(
+      "SELECT * FROM article_bucket WHERE approved = true",
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result.rows);
+        }
       }
-    });
+    );
   });
 };

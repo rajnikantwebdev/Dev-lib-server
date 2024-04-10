@@ -2,13 +2,15 @@ import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { getAllVideoData, writeUserData } from "./router.js";
+
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
   removeVideoIdFromSavedList,
   getAllSavedVideos,
 } from "./savedVideosRouter.js";
-import { addArticle } from "./articlesRouter.js";
+
+import { addArticle, getAllArticles } from "./articlesRouter.js";
 
 import {
   addUserLike,
@@ -92,8 +94,24 @@ app.get("/api/updatedLikeVideos", async (req, res) => {
     const response = await getUpdateLikedVideo(lastTimeStamp);
     res.status(200).json({ data: response });
   } catch (error) {
-    console.log(error);
+    console.log("error during updating likes: ", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// get req for all articles
+app.get("/api/getArticles", async (req, res) => {
+  try {
+    const response = await getAllArticles();
+    res.status(200).json({ data: response });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: {
+        message:
+          "An error occurred while retrieving articles. Please try again later.",
+      },
+    });
   }
 });
 
