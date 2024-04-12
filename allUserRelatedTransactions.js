@@ -229,3 +229,4 @@ export const updateUserImageUrl = async (req) => {
     );
   });
 };
+
