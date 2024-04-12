@@ -22,7 +22,7 @@ export const removeUserLikedVideo = (body) => {
   return new Promise((resolve, reject) => {
     const { userId, vid_id } = body;
     pool.query(
-      "UPDATE users SET liked_videos = array_remove(liked_videos, $2) WHERE user_id = $1",
+      "UPDATE video_bucket SET liked_videos = array_remove(liked_videos, $2) WHERE uid = $1",
       [userId, vid_id],
       (error, result) => {
         if (error) {
@@ -46,7 +46,7 @@ export const getAllLikedVideos = (body) => {
         if (error) {
           reject(error);
         } else {
-          console.log("result rows",result.rows[0])
+          console.log("result rows", result.rows[0]);
           resolve(result.rows[0]);
         }
       }
