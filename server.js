@@ -24,6 +24,10 @@ import {
   searchUserValues,
   addUserIdToUsersTable,
   createUserBukcet,
+  getUserProfilePicture,
+  getallUserDataFromDatabase,
+  updateUser,
+  updateUserImageUrl
 } from "./allUserRelatedTransactions.js";
 
 
@@ -270,12 +274,6 @@ export default app;
 
 
 
-app.post("/adduser", (req, res) => {
-  handlePostPromise(addUserDetails(req.body), res);
-});
-
-
-
 
 app.post("/checkUserExist", (req, res) => {
   console.log(req.body);
@@ -294,6 +292,29 @@ app.get("/searchUsers", (req, res) => {
 
 
 app.post("/adduser", (req, res) => {
-  
   handlePostPromise(addUserIdToUsersTable(req.body),res)
 });
+
+
+
+app.post("/updateuser", (req, res) => {
+  handlePostPromise(updateUser(req.body.user),res)
+});
+
+
+
+app.get("/get-user-profilepicture", (req, res) => {
+  console.log(req.query.user_id)
+  handlePostPromise(getUserProfilePicture(req.query.user_id), res);
+});
+
+app.post("/update-profile-picture",(req,res)=>{
+  handlePostPromise(updateUserImageUrl(req.body),res)
+})
+
+
+app.get("/getUserDataFromDatabase", (req, res) => {
+  console.log(req.query.user_id)
+  handlePostPromise(getallUserDataFromDatabase(req.query.user_id), res);
+});
+
