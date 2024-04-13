@@ -5,12 +5,24 @@ export const addArticle = (body) => {
   return new Promise((resolve, reject) => {
     const { userId, title, url, review, comment } = body;
     const options = { url: url };
-
+    console.log("before options");
+    console.log(
+      "userId: ",
+      userId,
+      "title: ",
+      title,
+      "url: ",
+      url,
+      "review: ",
+      review
+    );
+    console.log("i am here");
     ogs(options).then((data) => {
       const { error, result } = data;
+      console.log("error: ", error, "result: ", result);
       if (error) {
         console.log("ops error: ", error);
-        reject(error);
+        reject({ errorsMessage: error });
       } else {
         console.log("result: ", result.ogImage[0]);
         let imgUrl = result?.ogImage[0]?.url;
@@ -24,10 +36,13 @@ export const addArticle = (body) => {
           [userId, title, url, imgUrl, imgAlt, comment, review],
           (error, result) => {
             if (error) {
-              console.log(error);
+              console.log("pool error: ", error);
               reject(error);
             } else {
-              resolve(result);
+              resolve({
+                message: "New Article has been added",
+                data: result,
+              });
             }
           }
         );

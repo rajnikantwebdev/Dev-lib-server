@@ -57,7 +57,7 @@ export const addUserIdToUsersTable = (body) => {
 };
 
 export const searchUserValues = async (words) => {
-  console.log(words);
+  // console.log(words)
   return new Promise((resolve, reject) => {
     pool.query(
       "SELECT user_id ,user_name, name FROM users WHERE name ILIKE $1",
@@ -77,7 +77,7 @@ export const searchUserValues = async (words) => {
 
 export const createUserBukcet = (body) => {
   const { uid } = body;
-  console.log(uid);
+  // console.log(uid);
 
   return new Promise((OuterResolve, OuterReject) => {
     pool.query(

@@ -40,7 +40,7 @@ import { handlePostPromise } from "./skeltonFunctions.js";
 import pkg from "pg";
 import "dotenv/config";
 
-
+import createSummary from "./summaryApi.js";
 const { Pool } = pkg;
 const router = express.Router();
 const app = express();
@@ -74,6 +74,9 @@ export const pool = new Pool({
 
 app.get("/", (req, res) => {
   res.send("hello world");
+  const articleUrl =
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce";
+  createSummary();
 });
 
 app.post("/api/addNewArticle", async (req, res) => {
@@ -182,7 +185,6 @@ app.post("/add-yt-vid", (req, res) => {
 app.get("/get-yt-vid", (req, res) => {
   getAllVideoData()
     .then((response) => {
-      console.log("response: ", response.data);
       res.status(200).send(response.data);
     })
     .catch((error) => {
@@ -190,14 +192,14 @@ app.get("/get-yt-vid", (req, res) => {
     });
 });
 
-app.post("/api/addVideoId", async (req, res) => {
-  try {
-    const response = await addVideoId(req.body);
-    res.status(200).send({ data: response });
-  } catch (error) {
-    res.status(500).json({ error: error });
-  }
-});
+// app.post("/api/addVideoId", async (req, res) => {
+//   try {
+//     const response = await addVideoId(req.body);
+//     res.status(200).send({ data: response });
+//   } catch (error) {
+//     res.status(500).json({ error: error });
+//   }
+// });
 
 app.post("/api/getAllLikedVideos", async (req, res) => {
   try {
@@ -320,7 +322,11 @@ app.get("/searchUsers", (req, res) => {
 
 
 app.post("/adduser", (req, res) => {
-  handlePostPromise(addUserIdToUsersTable(req.body),res)
+  handlePostPromise(addUserIdToUsersTable(req.body),res)})
+
+  
+app.post("/addUserId", (req, res) => {
+  handlePostPromise(addUserIdToUsersTable(req.body), res);
 });
 
 
