@@ -16,7 +16,6 @@ export const getUserDetailsForUserPage = async (user_id) => {
   });
 };
 
-
 export const addUserIdToUsersTable = (body) => {
   return new Promise(function (resolve, reject) {
     const { userId } = body;
@@ -56,7 +55,7 @@ export const getAllUserIdAndName = async (name) => {
 };
 
 export const searchUserValues = async (words) => {
-  console.log(words)
+  // console.log(words)
   return new Promise((resolve, reject) => {
     pool.query(
       "SELECT user_id ,user_name, name FROM users WHERE name ILIKE $1",
@@ -76,7 +75,7 @@ export const searchUserValues = async (words) => {
 
 export const createUserBukcet = (body) => {
   const { uid } = body;
-  console.log(uid);
+  // console.log(uid);
 
   return new Promise((OuterResolve, OuterReject) => {
     pool.query(
@@ -89,15 +88,16 @@ export const createUserBukcet = (body) => {
         }
         if (result) {
           console.log("result", result["rows"][0]);
-          const userName = result["rows"][0]["user_name"];new Promise((resolve, reject) => {
+          const userName = result["rows"][0]["user_name"];
+          new Promise((resolve, reject) => {
             pool.query(
               "INSERT INTO video_bucket (user_id,user_name) VALUES ($1,$2) ",
               [uid, userName],
               (error, result) => {
                 if (error) {
                   console.log(error);
-                  if(error.code='23505'){
-                    reject("the userBucket Already Exist")
+                  if ((error.code = "23505")) {
+                    reject("the userBucket Already Exist");
                   }
                   reject(error);
                 } else {
@@ -106,7 +106,7 @@ export const createUserBukcet = (body) => {
                     bucketCreated: true,
                   };
                   resolve(response);
-                  OuterResolve(response)
+                  OuterResolve(response);
                 }
               }
             );
@@ -116,9 +116,6 @@ export const createUserBukcet = (body) => {
     );
   });
 };
-
-
-
 
 export const checkUserExistence = (body) => {
   console.log("we got here");
