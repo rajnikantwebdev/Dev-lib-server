@@ -40,13 +40,13 @@ export const getAllLikedVideos = (body) => {
   return new Promise((resolve, reject) => {
     const { userId } = body;
     pool.query(
-      "SELECT liked_videos FROM video_bucket WHERE uid = $1",
+      "SELECT liked_videos FROM video_bucket WHERE user_id = $1",
       [userId],
       (error, result) => {
         if (error) {
           reject(error);
         } else {
-          console.log("result rows", result.rows[0]);
+          // console.log("result rows", result.rows[0]);
           resolve(result.rows[0]);
         }
       }

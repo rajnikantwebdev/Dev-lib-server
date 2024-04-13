@@ -5,7 +5,16 @@ export const addArticle = (body) => {
   return new Promise((resolve, reject) => {
     const { userId, title, url, review, comment } = body;
     const options = { url: url };
-
+    console.log(
+      "userId: ",
+      userId,
+      "title: ",
+      title,
+      "url: ",
+      url,
+      "review: ",
+      review
+    );
     ogs(options).then((data) => {
       const { error, result } = data;
       if (error) {
