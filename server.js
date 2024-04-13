@@ -32,7 +32,7 @@ import {
   updateUserImageUrl
 } from "./allUserRelatedTransactions.js";
 
-
+import { userPostCount } from "./userSearchRelatedTransactions.js";
 
 
 
@@ -302,47 +302,57 @@ export default app;
 
 
 
-
+//checks if user exists in the db
 app.post("/checkUserExist", (req, res) => {
   console.log(req.body);
   handlePostPromise(checkUserExistence(req.body), res);
 });
 
+
+//after checking if the user does not exist it adds it to the db
+app.post("/adduser", (req, res) => {
+  handlePostPromise(addUserIdToUsersTable(req.body),res)
+});
+
+
+//if the user is created the user will need a video Bucket so here he will have its video bucket created
 app.post("/addUserVideoBucket", (req, res) => {
   console.log(req.body);
   handlePostPromise(createUserBukcet(req.body), res);
 });
 
+//this is made for one user to search other fellow users on devlib
 app.get("/searchUsers", (req, res) => {
   console.log(req.query.searchedWords)
   handlePostPromise(searchUserValues(req.query.searchedWords), res);
 });
 
 
-app.post("/adduser", (req, res) => {
-  handlePostPromise(addUserIdToUsersTable(req.body),res)
+//this is created for users to get their profile picture from their account.
+app.get("/get-user-profilepicture", (req, res) => {
+  console.log(req.query.user_id)
+  handlePostPromise(getUserProfilePicture(req.query.user_id), res);
 });
 
 
+//this is to update user profile picture if user is unhappy or not satisfied by his/her photo he can update it 
+app.post("/update-profile-picture",(req,res)=>{
+  handlePostPromise(updateUserImageUrl(req.body),res)
+})
 
+//this is to get user data from the database so we they can see each others details
+app.get("/getUserDataFromDatabase", (req, res) => {
+  console.log(req.query.user_id)
+  handlePostPromise(getallUserDataFromDatabase(req.query.user_id), res);
+});
+
+//this is made to update user's personal profile according to their prefrence
 app.post("/updateuser", (req, res) => {
   handlePostPromise(updateUser(req.body.user),res)
 });
 
 
 
-app.get("/get-user-profilepicture", (req, res) => {
-  console.log(req.query.user_id)
-  handlePostPromise(getUserProfilePicture(req.query.user_id), res);
-});
-
-app.post("/update-profile-picture",(req,res)=>{
-  handlePostPromise(updateUserImageUrl(req.body),res)
+app.post("/api/user/post-count",(req,res)=>{
+  handlePostPromise(userPostCount(req),res)
 })
-
-
-app.get("/getUserDataFromDatabase", (req, res) => {
-  console.log(req.query.user_id)
-  handlePostPromise(getallUserDataFromDatabase(req.query.user_id), res);
-});
-
