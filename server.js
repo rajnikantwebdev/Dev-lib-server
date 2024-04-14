@@ -2,7 +2,6 @@ import express, { response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { getAllVideoData, writeUserData } from "./router.js";
-
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
@@ -27,6 +26,10 @@ import {
   searchUserValues,
   addUserIdToUsersTable,
   createUserBukcet,
+  getUserProfilePicture,
+  getallUserDataFromDatabase,
+  updateUser,
+  updateUserImageUrl,
 } from "./allUserRelatedTransactions.js";
 
 import { handlePostPromise } from "./skeltonFunctions.js";
@@ -288,10 +291,6 @@ app.listen(process.env.PORT, function () {
 
 export default app;
 
-app.post("/adduser", (req, res) => {
-  handlePostPromise(addUserDetails(req.body), res);
-});
-
 app.post("/checkUserExist", (req, res) => {
   // console.log(req.body);
   handlePostPromise(checkUserExistence(req.body), res);
@@ -303,10 +302,32 @@ app.post("/addUserVideoBucket", (req, res) => {
 });
 
 app.get("/searchUsers", (req, res) => {
-  // console.log(req.query.searchedWords);
+  console.log(req.query.searchedWords);
   handlePostPromise(searchUserValues(req.query.searchedWords), res);
+});
+
+app.post("/adduser", (req, res) => {
+  handlePostPromise(addUserIdToUsersTable(req.body), res);
 });
 
 app.post("/addUserId", (req, res) => {
   handlePostPromise(addUserIdToUsersTable(req.body), res);
+});
+
+app.post("/updateuser", (req, res) => {
+  handlePostPromise(updateUser(req.body.user), res);
+});
+
+app.get("/get-user-profilepicture", (req, res) => {
+  console.log(req.query.user_id);
+  handlePostPromise(getUserProfilePicture(req.query.user_id), res);
+});
+
+app.post("/update-profile-picture", (req, res) => {
+  handlePostPromise(updateUserImageUrl(req.body), res);
+});
+
+app.get("/getUserDataFromDatabase", (req, res) => {
+  console.log(req.query.user_id);
+  handlePostPromise(getallUserDataFromDatabase(req.query.user_id), res);
 });
