@@ -88,7 +88,7 @@ app.get("/api/likedVideo", async (req, res) => {
     res.status(200).send({ data: response });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
-    console.log(error);
+    console.log("errors while getting all liked videos: ", error);
   }
 });
 
@@ -131,7 +131,7 @@ app.post("/api/updateSavedPost", async (req, res) => {
 
 app.post("/api/checkIfVideoIdExists", async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const ifVideoIdExistsResponse = await checkIfVideoIdExists(req.body);
     res.status(200).json({ data: ifVideoIdExistsResponse });
   } catch (error) {
@@ -142,7 +142,7 @@ app.post("/api/checkIfVideoIdExists", async (req, res) => {
 
 app.post("/api/removeVideoFromSavedVideos", async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const removeVideoResponse = await removeVideoIdFromSavedList(req.body);
     res.status(200).json({ data: removeVideoResponse });
   } catch (error) {
@@ -156,7 +156,7 @@ app.post("/api/getAllSavedVideos", async (req, res) => {
     const getAllSavedVideosResponse = await getAllSavedVideos(req.body);
     res.status(200).json({ data: getAllSavedVideosResponse });
   } catch (error) {
-    console.log(error);
+    console.log("error while getting all saved vidoes: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -208,7 +208,7 @@ app.post("/api/removeUserLikedVideo", async (req, res) => {
     const removeUserLikedVideoResponse = await removeUserLikedVideo(req.body);
     res.status(200).json({ data: removeUserLikedVideoResponse });
   } catch (error) {
-    console.log(error);
+    console.log("error while removing user likes: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -218,7 +218,7 @@ app.post("/api/addLike", async (req, res) => {
     const addLikeResponse = await addUserLike(req.body);
     res.status(200).json({ data: addLikeResponse });
   } catch (error) {
-    console.log(error);
+    console.log("error while adding like:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -239,7 +239,7 @@ app.post("/api/incrementLikeCount", async (req, res) => {
     const incrementLikeCountResponse = await incrementLikeCount(req.body);
     res.status(200).json({ data: incrementLikeCountResponse });
   } catch (error) {
-    console.log(error);
+    console.log("error while incrementing user likes: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -249,7 +249,7 @@ app.post("/api/decrementLikeCount", async (req, res) => {
     const decrementLikeCountResponse = await decrementLikeCount(req.body);
     res.status(200).json({ data: decrementLikeCountResponse });
   } catch (error) {
-    console.log(error);
+    console.log("error while decrementing user Likes: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -257,30 +257,30 @@ app.post("/api/decrementLikeCount", async (req, res) => {
 app.get("/get-userDeta", async (req, res) => {
   try {
     const userId = req.query.user_id;
-    console.log(userId);
+    // console.log(userId);
     getUserDetailsForUserPage(userId).then((response) => {
       console.log("response: ", response);
       res.status(200).send(response);
     });
   } catch (error) {
-    console.log(error);
+    console.log("error while getting user data: ", error);
     res.status(500).json({ error: error });
   }
 });
 
-app.get("/get-userDeta", async (req, res) => {
-  try {
-    const userId = req.query.user_id;
-    console.log(userId);
-    getUserDetailsForUserPage(userId).then((response) => {
-      console.log("response: ", response);
-      res.status(200).send(response);
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error });
-  }
-});
+// app.get("/get-userDeta", async (req, res) => {
+//   try {
+//     const userId = req.query.user_id;
+//     // console.log(userId);
+//     getUserDetailsForUserPage(userId).then((response) => {
+//       console.log("response: ", response);
+//       res.status(200).send(response);
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ error: error });
+//   }
+// });
 
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");
@@ -293,17 +293,17 @@ app.post("/adduser", (req, res) => {
 });
 
 app.post("/checkUserExist", (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   handlePostPromise(checkUserExistence(req.body), res);
 });
 
 app.post("/addUserVideoBucket", (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   handlePostPromise(createUserBukcet(req.body), res);
 });
 
 app.get("/searchUsers", (req, res) => {
-  console.log(req.query.searchedWords);
+  // console.log(req.query.searchedWords);
   handlePostPromise(searchUserValues(req.query.searchedWords), res);
 });
 

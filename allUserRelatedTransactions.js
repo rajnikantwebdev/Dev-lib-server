@@ -95,7 +95,7 @@ export const createUserBukcet = (body) => {
               [uid, userName],
               (error, result) => {
                 if (error) {
-                  console.log(error);
+                  console.log("video_bucket error: ", error);
                   if ((error.code = "23505")) {
                     reject("the userBucket Already Exist");
                   }
@@ -127,7 +127,7 @@ export const checkUserExistence = (body) => {
       [user_id],
       (error, result) => {
         if (error) {
-          console.log(error);
+          console.log("checkUserExists error: ", error);
           reject(error);
         } else {
           // If user_count is greater than 0, the user exists

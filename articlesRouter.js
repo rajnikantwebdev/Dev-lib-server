@@ -6,17 +6,6 @@ export const addArticle = (body) => {
     const { userId, title, url, review, comment } = body;
     const options = { url: url };
     console.log("before options");
-    console.log(
-      "userId: ",
-      userId,
-      "title: ",
-      title,
-      "url: ",
-      url,
-      "review: ",
-      review
-    );
-    console.log("i am here");
     ogs(options).then((data) => {
       const { error, result } = data;
       console.log("error: ", error, "result: ", result);
@@ -48,6 +37,7 @@ export const addArticle = (body) => {
         );
       }
     });
+    console.log("after options");
   });
 };
 

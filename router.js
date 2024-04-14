@@ -18,7 +18,7 @@ export const writeUserData = (body) => {
       [userId, title, vid_id, tags],
       (error, result) => {
         if (error) {
-          console.log(error);
+          console.log("error while adding user data to ytvid table: ", error);
           reject(error);
         }
         if (result && result.rows) {
