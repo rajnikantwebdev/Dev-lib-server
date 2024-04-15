@@ -46,7 +46,7 @@ const fetch = (...args) =>
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://devlib-psi.vercel.app/"], // Allow requests from http://localhost:3000
+    origin: ["http://localhost:3000", "https://devlib-psi.vercel.app"], // Allow requests from http://localhost:3000
     credentials: true,
   })
 );
