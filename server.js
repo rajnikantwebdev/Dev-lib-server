@@ -54,25 +54,25 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Access-Control-Allow-Headers, Authorization"
-  );
+// app.use(function (req, res, next) {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, PUT, DELETE, OPTIONS"
+//   );
+//   res.setHeader(
+//     "Access-Control-Allow-Headers",
+//     "Content-Type, Access-Control-Allow-Headers, Authorization"
+//   );
 
-  // Handle preflight requests
-  if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
-  }
+//   // Handle preflight requests
+//   if (req.method === "OPTIONS") {
+//     res.status(200).end();
+//     return;
+//   }
 
-  next();
-});
+//   next();
+// });
 
 export const pool = new Pool({
   connectionString:
