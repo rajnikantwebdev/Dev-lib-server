@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { getAllVideoData, writeUserData } from "./router.js";
