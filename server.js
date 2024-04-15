@@ -176,7 +176,7 @@ app.post("/add-yt-vid", (req, res) => {
 });
 
 // get all the youtube video from the database
-app.get("get-yt-vid", (req, res) => {
+app.get("/get-yt-vid", (req, res) => {
   getAllVideoData()
     .then((response) => {
       res.status(200).send(response.data);
