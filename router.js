@@ -1,24 +1,25 @@
 import { pool } from "./server.js";
-
-export const getUsers = (request, response) => {
-  pool.query("SELECT * FROM youtubevideos ORDER BY id ASC", (err, res) => {
-    if (err) {
-      throw err;
-    }
-    response.status(200).json(res.rows);
-  });
-};
+import { v4 as uuidv4 } from "uuid";
+// export const getUsers = (request, response) => {
+//   pool.query("SELECT * FROM youtubevideos ORDER BY id ASC", (err, res) => {
+//     if (err) {
+//       throw err;
+//     }
+//     response.status(200).json(res.rows);
+//   });
+// };
 
 // api so that user can upload youtube video
 export const writeUserData = (body) => {
   return new Promise(function (resolve, reject) {
     const { userId, title, vid_id, tags } = body;
+    const uuid = uuidv4();
     pool.query(
-      "INSERT INTO ytvid (user_id, title, vid_id, created_at, tags) VALUES ($1, $2, $3, CURRENT_TIMESTAMP, $4) RETURNING *",
-      [userId, title, vid_id, tags],
+      "INSERT INTO ytvid (user_id, title, vid_id, created_at, tags, unique_id) VALUES ($1, $2, $3, CURRENT_TIMESTAMP, $4, $5) RETURNING *",
+      [userId, title, vid_id, tags, uuid],
       (error, result) => {
         if (error) {
-          console.log("error while adding user data to ytvid table: ", error);
+          console.log("error while adding user data to ytVid table", error);
           reject(error);
         }
         if (result && result.rows) {

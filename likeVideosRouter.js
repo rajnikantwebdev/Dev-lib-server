@@ -5,7 +5,7 @@ export const addUserLike = (body) => {
   return new Promise((resolve, reject) => {
     const { userId, vid_id } = body;
     pool.query(
-      "UPDATE video_bucket SET liked_videos = array_append(liked_videos, $2) WHERE uid = $1",
+      "UPDATE video_bucket SET liked_videos = array_append(liked_videos, $2) WHERE user_id = $1",
       [userId, vid_id],
       (error, result) => {
         if (error) {
@@ -20,10 +20,10 @@ export const addUserLike = (body) => {
 // remove the user like id he already like it
 export const removeUserLikedVideo = (body) => {
   return new Promise((resolve, reject) => {
-    const { userId, vid_id } = body;
+    const { userId, unique_id } = body;
     pool.query(
-      "UPDATE video_bucket SET liked_videos = array_remove(liked_videos, $2) WHERE uid = $1",
-      [userId, vid_id],
+      "UPDATE video_bucket SET liked_videos = array_remove(liked_videos, $2) WHERE user_id = $1",
+      [userId, unique_id],
       (error, result) => {
         if (error) {
           reject(error);
@@ -46,7 +46,6 @@ export const getAllLikedVideos = (body) => {
         if (error) {
           reject(error);
         } else {
-          // console.log("result rows", result.rows[0]);
           resolve(result.rows[0]);
         }
       }
@@ -75,10 +74,10 @@ export const checkIfLikedVideoExists = (body) => {
 // api to increment like count
 export const incrementLikeCount = (body) => {
   return new Promise((resolve, reject) => {
-    const { vid_id } = body;
+    const { unique_id } = body;
     pool.query(
-      "UPDATE ytvid SET likes_count = likes_count + 1 WHERE vid_id = $1",
-      [vid_id],
+      "UPDATE ytvid SET likes_count = likes_count + 1 WHERE unique_id = $1",
+      [unique_id],
       (error, result) => {
         if (error) {
           reject(error);
@@ -92,10 +91,10 @@ export const incrementLikeCount = (body) => {
 // api to decrement like count
 export const decrementLikeCount = (body) => {
   return new Promise((resolve, reject) => {
-    const { vid_id } = body;
+    const { unique_id } = body;
     pool.query(
-      "UPDATE ytvid SET likes_count = likes_count - 1 WHERE vid_id = $1",
-      [vid_id],
+      "UPDATE ytvid SET likes_count = likes_count - 1 WHERE unique_id = $1",
+      [unique_id],
       (error, result) => {
         if (error) {
           reject(error);

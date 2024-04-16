@@ -179,18 +179,9 @@ app.get("/get-yt-vid", (req, res) => {
     });
 });
 
-// app.post("/api/addVideoId", async (req, res) => {
-//   try {
-//     const response = await addVideoId(req.body);
-//     res.status(200).send({ data: response });
-//   } catch (error) {
-//     res.status(500).json({ error: error });
-//   }
-// });
-
 app.post("/api/getAllLikedVideos", async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const getAllLikedVideosResponse = await getAllLikedVideos(req.body);
     res.status(200).json({ data: getAllLikedVideosResponse });
   } catch (error) {
