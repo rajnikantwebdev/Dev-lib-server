@@ -55,26 +55,6 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use(function (req, res, next) {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader(
-//     "Access-Control-Allow-Methods",
-//     "GET, POST, PUT, DELETE, OPTIONS"
-//   );
-//   res.setHeader(
-//     "Access-Control-Allow-Headers",
-//     "Content-Type, Access-Control-Allow-Headers, Authorization"
-//   );
-
-//   // Handle preflight requests
-//   if (req.method === "OPTIONS") {
-//     res.status(200).end();
-//     return;
-//   }
-
-//   next();
-// });
-
 export const pool = new Pool({
   connectionString:
     "postgres://default:d8vZwTjxBAq5@ep-tight-credit-a12mr80v-pooler.ap-southeast-1.aws.neon.tech:5432/verceldb?sslmode=require",
@@ -89,7 +69,7 @@ app.get("/", (req, res) => {
 
 app.post("/api/addNewArticle", async (req, res) => {
   try {
-    const response = addArticle(req.body);
+    const response = await addArticle(req.body);
     res.status(200).json({ data: response });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
