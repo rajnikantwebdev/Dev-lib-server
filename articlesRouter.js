@@ -58,12 +58,12 @@ import getMetaData from "metadata-scraper";
 export const addArticle = (body) => {
   return new Promise(async (resolve, reject) => {
     const { userId, title, url, review, comment } = body;
-    const data = await getMetaData(url);
-    console.log("data: ", data);
+    // const data = await getMetaData(url);
+    // console.log("data: ", data);
 
     pool.query(
-      "INSERT INTO article_bucket (user_id, title, url, imgUrl, imgAlt, comment, review) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-      [userId, title, url, data?.image, title, comment, review],
+      "INSERT INTO article_bucket (user_id, title, url, comment, review) VALUES($1, $2, $3, $4, $5, $6) RETURNING *",
+      [userId, title, url, title, comment, review],
       (error, dbResult) => {
         if (error) {
           console.log("pool error: ", error);
