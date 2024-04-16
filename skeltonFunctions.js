@@ -4,7 +4,6 @@
 
 
 export function handlePostPromise(promise, res) {
-
     promise
       .then((response) => {
         console.log("res Result",response)

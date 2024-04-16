@@ -32,7 +32,7 @@ import {
   updateUserImageUrl
 } from "./allUserRelatedTransactions.js";
 
-import { userPostCount } from "./userSearchRelatedTransactions.js";
+import { userPostCount,checkUserFollow,followUser,unfollowUser } from "./userSearchRelatedTransactions.js";
 
 
 
@@ -48,12 +48,13 @@ const app = express();
 const fetch = (...args) =>
   import(node - fetch).then(({ default: fetch }) => fetch(...args));
 
-app.use(
-  cors({
-    origin: "http://localhost:3000", // Allow requests from http://localhost:3000
-    credentials: true,
-  })
-);
+  app.use(
+    cors({
+      origin: ["http://localhost:3000", /\.vercel\.app$/], // Allow requests from http://localhost:3000 and any subdomain of example.com
+      credentials: true,
+    })
+  );
+  
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -355,4 +356,22 @@ app.post("/updateuser", (req, res) => {
 
 app.post("/api/user/post-count",(req,res)=>{
   handlePostPromise(userPostCount(req),res)
+})
+
+
+
+app.get("/api/before_follow",(req,res)=>{
+  console.log("I got the check hit")
+  handlePostPromise(checkUserFollow(req),res)
+})
+
+
+app.get("/api/user/on_follow",(req,res)=>{
+  console.log("I got the follow Hit")
+  handlePostPromise(followUser(req),res)
+})
+
+app.get("/api/user/on_un_follow",(req,res)=>{
+  console.log("I got the follow Hit")
+  handlePostPromise(unfollowUser(req),res)
 })
