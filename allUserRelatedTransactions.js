@@ -57,7 +57,7 @@ export const addUserIdToUsersTable = (body) => {
 };
 
 export const searchUserValues = async (words) => {
-  console.log(words);
+  // console.log(words)
   return new Promise((resolve, reject) => {
     pool.query(
       "SELECT user_id ,user_name, name FROM users WHERE name ILIKE $1",
@@ -77,7 +77,7 @@ export const searchUserValues = async (words) => {
 
 export const createUserBukcet = (body) => {
   const { uid } = body;
-  console.log(uid);
+  // console.log(uid);
 
   return new Promise((OuterResolve, OuterReject) => {
     pool.query(
@@ -97,7 +97,7 @@ export const createUserBukcet = (body) => {
               [uid, userName],
               (error, result) => {
                 if (error) {
-                  console.log(error);
+                  console.log("video_bucket error: ", error);
                   if ((error.code = "23505")) {
                     reject("the userBucket Already Exist");
                   }
@@ -129,7 +129,7 @@ export const checkUserExistence = (body) => {
       [user_id],
       (error, result) => {
         if (error) {
-          console.log(error);
+          console.log("checkUserExists error: ", error);
           reject(error);
         } else {
           // If user_count is greater than 0, the user exists
