@@ -1,13 +1,5 @@
 import { pool } from "./server.js";
 import { v4 as uuidv4 } from "uuid";
-// export const getUsers = (request, response) => {
-//   pool.query("SELECT * FROM youtubevideos ORDER BY id ASC", (err, res) => {
-//     if (err) {
-//       throw err;
-//     }
-//     response.status(200).json(res.rows);
-//   });
-// };
 
 // api so that user can upload youtube video
 export const writeUserData = (body) => {

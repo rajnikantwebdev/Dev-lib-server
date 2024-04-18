@@ -177,24 +177,12 @@ export const getallUserDataFromDatabase = (user_id) => {
   });
 };
 
-
-
-
-
-
-
 export const updateUser = (user) => {
-
-  console.log("socialMedia Links",user.socialmedialinks)
+  console.log("socialMedia Links", user.socialmedialinks);
   return new Promise((resolve, reject) => {
     pool.query(
       "UPDATE users SET  socialmedialinks = $1, website = $2, name = $3 WHERE user_id = $4",
-      [
-        user.socialmedialinks,
-        user.website,
-        user.name,
-        user.user_id,
-      ],
+      [user.socialmedialinks, user.website, user.name, user.user_id],
       (error, results) => {
         if (error) {
           reject(error);
@@ -212,12 +200,12 @@ export const updateUser = (user) => {
 
 export const updateUserImageUrl = async (req) => {
   const { user_id, img_link } = req;
-  console.log(user_id, img_link )
+  console.log(user_id, img_link);
 
   return new Promise((res, rej) => {
     pool.query(
-      'UPDATE users SET profilepicture = $1 WHERE user_id = $2',
-        [img_link, user_id],
+      "UPDATE users SET profilepicture = $1 WHERE user_id = $2",
+      [img_link, user_id],
       (error, result) => {
         if (error) {
           rej(error);
@@ -229,4 +217,3 @@ export const updateUserImageUrl = async (req) => {
     );
   });
 };
-
