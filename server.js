@@ -37,10 +37,12 @@ import { addComment, getAllComments } from "./commentRoutes.js";
 import { handlePostPromise } from "./skeltonFunctions.js";
 import pkg from "pg";
 import "dotenv/config";
+import { Redis } from "ioredis";
 
 import createSummary from "./summaryApi.js";
 
 const { Pool } = pkg;
+const redis = new Redis();
 const router = express.Router();
 const app = express();
 
@@ -170,15 +172,30 @@ app.post("/add-yt-vid", (req, res) => {
 });
 
 // get all the youtube video from the database
-app.get("/get-yt-vid", (req, res) => {
-  // console.log("Origin header: ", req.headers.origin);
-  getAllVideoData()
-    .then((response) => {
-      res.status(200).send(response.data);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+app.get("/get-yt-vid", async (req, res) => {
+  try {
+    // const cachedData = await redis.get("cachedData");
+    // if (cachedData) {
+    //   console.log("cachedData: ", cachedData);
+    //   res
+    //     .status(200)
+    //     .json({ data: JSON.parse(cachedData), message: "cached data" });
+    // } else {
+    const response = await getAllVideoData();
+
+    // await redis.set("cachedData", JSON.stringify(response.data), "EX", 3600);
+    res.status(200).json({ data: response.data, message: "Data fetched" });
+  } catch (error) {
+    console.log("error while fetching videos: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+  // getAllVideoData()
+  //   .then((response) => {
+  //     res.status(200).send(response.data);
+  //   })
+  //   .catch((error) => {
+  //     res.status(500).send(error);
+  //   });
 });
 
 app.post("/api/getAllLikedVideos", async (req, res) => {
