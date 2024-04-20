@@ -76,7 +76,7 @@ export const incrementLikeCount = (body) => {
   return new Promise((resolve, reject) => {
     const { unique_id } = body;
     pool.query(
-      "UPDATE ytvid SET likes_count = likes_count + 1 WHERE unique_id = $1",
+      "UPDATE video_like_and_dislike_count SET likecount = likecount + 1 WHERE id = $1",
       [unique_id],
       (error, result) => {
         if (error) {
@@ -93,7 +93,7 @@ export const decrementLikeCount = (body) => {
   return new Promise((resolve, reject) => {
     const { unique_id } = body;
     pool.query(
-      "UPDATE ytvid SET likes_count = likes_count - 1 WHERE unique_id = $1",
+      "UPDATE video_like_and_dislike_count SET likes_count = likes_count - 1 WHERE unique_id = $1",
       [unique_id],
       (error, result) => {
         if (error) {
@@ -105,9 +105,20 @@ export const decrementLikeCount = (body) => {
     );
   });
 };
-// api to get all the likes on videos
-// export const findAllLikeVideos = (body) => {
-//   return new Promise((resolve, reject) => {
 
-//   })
-// }
+// api to get total likes
+export const getAllLikesFromVideos = () => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      "SELECT * FROM video_like_and_dislike_count",
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          // console.log("likes-result: ", result.rows);
+          resolve(result.rows);
+        }
+      }
+    );
+  });
+};

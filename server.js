@@ -1,7 +1,13 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { getAllVideoData, writeUserData } from "./router.js";
+import { v4 as uuidv4 } from "uuid";
+
+import {
+  getAllVideoData,
+  writeUserData,
+  videoLikesAndDislikes,
+} from "./router.js";
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
@@ -18,6 +24,7 @@ import {
   checkIfLikedVideoExists,
   incrementLikeCount,
   decrementLikeCount,
+  getAllLikesFromVideos,
 } from "./likeVideosRouter.js";
 
 import {
@@ -167,42 +174,57 @@ app.post("/api/getAllSavedVideos", async (req, res) => {
 });
 
 // add youtube video in the database
-app.post("/add-yt-vid", (req, res) => {
-  writeUserData(req.body)
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
-
-// get all the youtube video from the database
-app.get("/get-yt-vid", async (req, res) => {
+app.post("/addVideo", async (req, res) => {
   try {
-    // const cachedData = await redis.get("cachedData");
-    // if (cachedData) {
-    //   console.log("cachedData: ", cachedData);
-    //   res
-    //     .status(200)
-    //     .json({ data: JSON.parse(cachedData), message: "cached data" });
-    // } else {
-    const response = await getAllVideoData();
-
-    // await redis.set("cachedData", JSON.stringify(response.data), "EX", 3600);
-    res.status(200).json({ data: response.data, message: "Data fetched" });
+    const unique_id = uuidv4();
+    const addVideoResponse = writeUserData(req.body, unique_id);
+    const addLikeAndDislikeResponse = videoLikesAndDislikes(
+      req.body,
+      unique_id
+    );
+    const response = Promise.all([addLikeAndDislikeResponse, addVideoResponse]);
+    res.status(200).send(response);
   } catch (error) {
-    console.log("error while fetching videos: ", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).send(error);
   }
-  // getAllVideoData()
+  // writeUserData(req.body)
   //   .then((response) => {
-  //     res.status(200).send(response.data);
+  //     res.status(200).send(response);
   //   })
   //   .catch((error) => {
   //     res.status(500).send(error);
   //   });
 });
+
+// get all the youtube video from the database
+app.get("/api/fetch/youtubeVideos", async (req, res) => {
+  try {
+    const videoResponse = await getAllVideoData();
+    // console.log("response: ", response);
+    res.status(200).json({ data: videoResponse.data, message: "Data fetched" });
+  } catch (error) {
+    console.log("error while fetching videos: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/api/fetch/videos/likesAndDislikes", async (req, res) => {
+  try {
+    const likesAndDislikesResponse = await getAllLikesFromVideos();
+    res.status(200).json({ data: likesAndDislikesResponse });
+  } catch (error) {
+    console.log("error while getting all likes: ", error);
+    res.status(500).json({ message: "error while fetching likes" });
+  }
+});
+// const cachedData = await redis.get("cachedData");
+// if (cachedData) {
+//   console.log("cachedData: ", cachedData);
+//   res
+//     .status(200)
+//     .json({ data: JSON.parse(cachedData), message: "cached data" });
+// } else {
+// await redis.set("cachedData", JSON.stringify(response.data), "EX", 3600);
 
 app.post("/api/getAllLikedVideos", async (req, res) => {
   try {

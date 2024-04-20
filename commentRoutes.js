@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 export const addComment = (body) => {
   return new Promise((resolve, reject) => {
     const { userId, vid_id, comment } = body;
+    console.log("user-id: ", userId, "vid_id: ", vid_id, "comment: ", comment);
     const unique_id = uuidv4();
     pool.query(
       "INSERT INTO comment_bucket (user_id, unique_id, vid_id, comment) VALUES ($1, $2, $3, $4)",
