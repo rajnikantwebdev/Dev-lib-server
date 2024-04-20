@@ -76,7 +76,7 @@ export const incrementLikeCount = (body) => {
   return new Promise((resolve, reject) => {
     const { unique_id } = body;
     pool.query(
-      "UPDATE video_like_and_dislike_count SET likecount = likecount + 1 WHERE id = $1",
+      "UPDATE video_like_and_dislike_count SET likecount = likecount + 1 WHERE unique_id = $1",
       [unique_id],
       (error, result) => {
         if (error) {
