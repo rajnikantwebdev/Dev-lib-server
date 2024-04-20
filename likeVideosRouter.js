@@ -5,7 +5,7 @@ export const addUserLike = (body) => {
   return new Promise((resolve, reject) => {
     const { userId, vid_id } = body;
     pool.query(
-      "UPDATE video_bucket SET liked_videos = array_append(liked_videos, $2) WHERE user_id = $1",
+      "INSERT INTO video_bucket (user_id, liked_videos) VALUES ($1, ARRAY[$2]) ON CONFLICT (user_id) DO UPDATE SET liked_videos = array_append(video_bucket.liked_videos, $2)",
       [userId, vid_id],
       (error, result) => {
         if (error) {
@@ -93,7 +93,7 @@ export const decrementLikeCount = (body) => {
   return new Promise((resolve, reject) => {
     const { unique_id } = body;
     pool.query(
-      "UPDATE video_like_and_dislike_count SET likes_count = likes_count - 1 WHERE unique_id = $1",
+      "UPDATE video_like_and_dislike_count SET likecount = likecount - 1 WHERE unique_id = $1",
       [unique_id],
       (error, result) => {
         if (error) {
