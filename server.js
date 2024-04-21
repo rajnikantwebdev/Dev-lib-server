@@ -39,7 +39,12 @@ import {
   updateUserImageUrl,
 } from "./allUserRelatedTransactions.js";
 
-import { addComment, getAllComments } from "./commentRoutes.js";
+import {
+  addComment,
+  getAllComments,
+  deleteComment,
+  updateComment,
+} from "./commentRoutes.js";
 import {
   userPostCount,
   checkUserFollow,
@@ -199,14 +204,34 @@ app.post("/addVideo", async (req, res) => {
 // get all the youtube video from the database
 app.get("/api/fetch/youtubeVideos", async (req, res) => {
   try {
-    const videoResponse = await getAllVideoData();
+    const cachedData = await redis.get("cachedData");
+    if (cachedData) {
+      // console.log("cachedData: ", cachedData);
+      res
+        .status(200)
+        .json({ data: JSON.parse(cachedData), message: "cached data" });
+    } else {
+      const videoResponse = await getAllVideoData();
+      await redis.set(
+        "cachedData",
+        JSON.stringify(videoResponse.data),
+        "EX",
+        3600
+      );
+
+      res
+        .status(200)
+        .json({ data: videoResponse.data, message: "Data fetched" });
+    }
     // console.log("response: ", response);
-    res.status(200).json({ data: videoResponse.data, message: "Data fetched" });
   } catch (error) {
     console.log("error while fetching videos: ", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+//
+//
 
 app.get("/api/fetch/videos/likesAndDislikes", async (req, res) => {
   try {
@@ -217,14 +242,6 @@ app.get("/api/fetch/videos/likesAndDislikes", async (req, res) => {
     res.status(500).json({ message: "error while fetching likes" });
   }
 });
-// const cachedData = await redis.get("cachedData");
-// if (cachedData) {
-//   console.log("cachedData: ", cachedData);
-//   res
-//     .status(200)
-//     .json({ data: JSON.parse(cachedData), message: "cached data" });
-// } else {
-// await redis.set("cachedData", JSON.stringify(response.data), "EX", 3600);
 
 app.post("/api/getAllLikedVideos", async (req, res) => {
   try {
@@ -389,4 +406,25 @@ app.get("/api/user/on_follow", (req, res) => {
 app.get("/api/user/on_un_follow", (req, res) => {
   console.log("I got the Unfollow Hit");
   handlePostPromise(unfollowUser(req), res);
+});
+
+app.post("/api/comment/delete", async (req, res) => {
+  try {
+    const response = await deleteComment(req.body);
+    res.status(200).json({ response });
+  } catch (error) {
+    console.log("error while deleting comment", error);
+    res.status(503).json({ message: "Server is unable to fulfill request" });
+  }
+});
+
+app.post("/api/comment/update", async (req, res) => {
+  try {
+    const response = await updateComment(req.body);
+    res.status(200).json({ response });
+  } catch (error) {
+    res
+      .status(503)
+      .json({ message: "Server is unable to update comment at the moment" });
+  }
 });
