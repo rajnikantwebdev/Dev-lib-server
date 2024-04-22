@@ -56,13 +56,10 @@ import {
 import { handlePostPromise } from "./skeltonFunctions.js";
 import pkg from "pg";
 import "dotenv/config";
-import { Redis } from "ioredis";
 
 import createSummary from "./summaryApi.js";
 
 const { Pool } = pkg;
-const redis = new Redis();
-const router = express.Router();
 const app = express();
 
 const fetch = (...args) =>
