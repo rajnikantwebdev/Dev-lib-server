@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { v4 as uuidv4 } from "uuid";
+import client from "./redisConfig.js";
 
 import {
   getAllVideoData,
@@ -204,15 +205,14 @@ app.post("/addVideo", async (req, res) => {
 // get all the youtube video from the database
 app.get("/api/fetch/youtubeVideos", async (req, res) => {
   try {
-    const cachedData = await redis.get("cachedData");
+    const cachedData = await client.get("cachedData");
     if (cachedData) {
-      // console.log("cachedData: ", cachedData);
       res
         .status(200)
         .json({ data: JSON.parse(cachedData), message: "cached data" });
     } else {
       const videoResponse = await getAllVideoData();
-      await redis.set(
+      await client.set(
         "cachedData",
         JSON.stringify(videoResponse.data),
         "EX",
