@@ -202,19 +202,23 @@ app.post("/addVideo", async (req, res) => {
 // get all the youtube video from the database
 app.get("/api/fetch/youtubeVideos", async (req, res) => {
   try {
-    const cachedData = await client.get("cachedData");
+    const page = parseInt(req.query.page);
+    // console.log("page in router: ", page);
+    const limit = 5;
+    // const cachedData = await client.get(`cachedData_page_${page}`);
+    const cachedData = false;
     if (cachedData) {
       res
         .status(200)
         .json({ data: JSON.parse(cachedData), message: "cached data" });
     } else {
-      const videoResponse = await getAllVideoData();
-      await client.set(
-        "cachedData",
-        JSON.stringify(videoResponse.data),
-        "EX",
-        3600
-      );
+      const videoResponse = await getAllVideoData(page, limit);
+      // await client.set(
+      //   `cachedData_page_${page}`,
+      //   JSON.stringify(videoResponse.data),
+      //   "EX",
+      //   3600
+      // );
 
       res
         .status(200)

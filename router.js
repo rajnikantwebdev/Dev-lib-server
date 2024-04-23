@@ -45,10 +45,15 @@ export const writeUserData = (body, unique_id) => {
 };
 
 //api to get all youtube videos
-export const getAllVideoData = () => {
+export const getAllVideoData = (page, limit) => {
   return new Promise(function (resolve, reject) {
+    const offset = (page - 1) * limit;
+    console.log("page: ", page);
+    console.log("offset: ", offset);
+    console.log("limit: ", limit);
     pool.query(
-      "SELECT id, user_id, title, vid_id, created_at, unique_id, tags FROM ytvid",
+      "SELECT id, user_id, title, vid_id, created_at, unique_id, tags FROM ytvid LIMIT $1 OFFSET $2",
+      [limit, offset],
       (error, result) => {
         if (error) {
           reject(error);
