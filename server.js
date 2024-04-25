@@ -51,17 +51,18 @@ import {
   checkUserFollow,
   followUser,
   unfollowUser,
+  userFollowerCount
 } from "./userSearchRelatedTransactions.js";
 
 import { handlePostPromise } from "./skeltonFunctions.js";
 import pkg from "pg";
 import "dotenv/config";
-import { Redis } from "ioredis";
+// import { Redis } from "ioredis";
 
 import createSummary from "./summaryApi.js";
 
 const { Pool } = pkg;
-const redis = new Redis();
+// const redis = new Redis();
 const router = express.Router();
 const app = express();
 
@@ -407,6 +408,28 @@ app.get("/api/user/on_un_follow", (req, res) => {
   console.log("I got the Unfollow Hit");
   handlePostPromise(unfollowUser(req), res);
 });
+
+app.get("/api/user/get_follower_count", (req, res) => {
+  console.log("I got the follower Count Hit");
+  // handlePostPromise(unfollowUser(req), res);
+  handlePostPromise(userFollowerCount(req),res)
+});
+
+// app.get("api/user/followerCount",(req,res)=>{
+//  
+//   handlePostPromise(userFollowerCount(req),res)
+// })
+
+
+
+app.get("api/user/getfollowingCount",(req,res)=>{
+  console.log("I got the following Count Hit");
+  handlePostPromise(followingCount(res),res)
+})
+
+
+
+
 
 app.post("/api/comment/delete", async (req, res) => {
   try {

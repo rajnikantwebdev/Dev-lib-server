@@ -72,3 +72,20 @@ export const unfollowUser = (req) => {
     );
   });
 };
+
+export const userFollowerCount = (req) => {
+  const {user_id}=req.query
+  return new Promise((resolve, reject) => {
+    pool.query("SELECT COUNT(*) FROM followers WHERE followed_id = $1"
+    ,[user_id], (err, res) => {
+      if (err) {
+        console.log(err);
+        reject(err);
+      }
+      if (res) {  
+        console.log(res.rows[0]);
+        resolve(res.rows[0]);
+      }
+    });
+  });
+};

@@ -159,6 +159,7 @@ export const getUserProfilePicture = (user_id) => {
 };
 
 export const getallUserDataFromDatabase = (user_id) => {
+  console.log("here i got the userID",user_id)
   return new Promise((resolve, reject) => {
     pool.query(
       "SELECT * FROM users WHERE user_id=$1",
