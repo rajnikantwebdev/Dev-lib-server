@@ -2,13 +2,9 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { v4 as uuidv4 } from "uuid";
-import client from "./redisConfig.js";
+// import client from "./redisConfig.js";
 
-import {
-  getAllVideoData,
-  writeUserData,
-  videoLikesAndDislikes,
-} from "./router.js";
+import { getAllVideoData, addVideo } from "./router.js";
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
@@ -57,8 +53,6 @@ import { handlePostPromise } from "./skeltonFunctions.js";
 import pkg from "pg";
 import "dotenv/config";
 
-import createSummary from "./summaryApi.js";
-
 const { Pool } = pkg;
 const app = express();
 
@@ -82,9 +76,6 @@ export const pool = new Pool({
 
 app.get("/", (req, res) => {
   res.send("hello world");
-  const articleUrl =
-    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce";
-  createSummary();
 });
 
 app.post("/api/addNewArticle", async (req, res) => {
@@ -171,7 +162,7 @@ app.post("/api/getAllSavedVideos", async (req, res) => {
     const getAllSavedVideosResponse = await getAllSavedVideos(req.body);
     res.status(200).json({ data: getAllSavedVideosResponse });
   } catch (error) {
-    console.log("error while getting all saved vidoes: ", error);
+    console.log("error while getting all saved videos: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -179,47 +170,40 @@ app.post("/api/getAllSavedVideos", async (req, res) => {
 // add youtube video in the database
 app.post("/addVideo", async (req, res) => {
   try {
-    const unique_id = uuidv4();
-    const addVideoResponse = writeUserData(req.body, unique_id);
-    const addLikeAndDislikeResponse = videoLikesAndDislikes(
-      req.body,
-      unique_id
-    );
-    const response = Promise.all([addLikeAndDislikeResponse, addVideoResponse]);
-    res.status(200).send(response);
+    const { success, id } = await addVideo(req.body);
+    if (success) {
+      res.status(200).send({ success: true, id });
+    } else {
+      res.status(500).send({ success: false, message: "Failed to add video" });
+    }
   } catch (error) {
-    res.status(500).send(error);
+    console.log("error while adding video: ", error);
+    res.status(500).send({ success: false, message: "Internal server error" });
   }
-  // writeUserData(req.body)
-  //   .then((response) => {
-  //     res.status(200).send(response);
-  //   })
-  //   .catch((error) => {
-  //     res.status(500).send(error);
-  //   });
 });
 
 // get all the youtube video from the database
 app.get("/api/fetch/youtubeVideos", async (req, res) => {
   try {
     const page = parseInt(req.query.page);
-    // console.log("page in router: ", page);
+    const query = req.query.q;
     const limit = 5;
     // const cachedData = await client.get(`cachedData_page_${page}`);
+
     const cachedData = false;
     if (cachedData) {
       res
         .status(200)
         .json({ data: JSON.parse(cachedData), message: "cached data" });
     } else {
-      const videoResponse = await getAllVideoData(page, limit);
+      const videoResponse = await getAllVideoData(page, limit, query);
       // await client.set(
       //   `cachedData_page_${page}`,
       //   JSON.stringify(videoResponse.data),
       //   "EX",
       //   3600
       // );
-
+      // await client.disconnect();
       res
         .status(200)
         .json({ data: videoResponse.data, message: "Data fetched" });
