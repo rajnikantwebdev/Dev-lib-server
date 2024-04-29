@@ -89,9 +89,9 @@ export const getAllVideoData = (page, limit, query) => {
 export const fetchPopularVideos = (page, limit) => {
   return new Promise((resolve, reject) => {
     const offset = (page - 1) * limit;
-    console.log("offset: ", offset);
+
     pool.query(
-      "SELECT ytvids.id, user_id, title, ytvids.vid_id, created_at, tags, like_count FROM ytvids INNER JOIN videos_like_and_dislike ON ytvids.id = videos_like_and_dislike.id ORDER BY like_count DESC LIMIT $1 OFFSET $2",
+      "SELECT ytvids.id, user_id, title, ytvids.vid_id, created_at, tags, like_count FROM ytvids INNER JOIN videos_like_and_dislike ON ytvids.id = videos_like_and_dislike.id ORDER BY like_count DESC, ytvids.id LIMIT $1 OFFSET $2",
       [limit, offset],
       (error, result) => {
         if (error) {

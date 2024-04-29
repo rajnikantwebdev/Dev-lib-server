@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import { v4 as uuidv4 } from "uuid";
 // import client from "./redisConfig.js";
 
-import { getAllVideoData, addVideo } from "./router.js";
+import { getAllVideoData, addVideo, fetchPopularVideos } from "./router.js";
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
@@ -182,11 +182,27 @@ app.post("/addVideo", async (req, res) => {
   }
 });
 
+// fetch all popular videos
+app.get("/api/fetch/popularVideos", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page);
+    // console.log(typeof page);
+    const limit = 5;
+    const response = await fetchPopularVideos(page, limit);
+    res.status(200).json({ data: response, success: true });
+  } catch (error) {
+    console.log("popular videos error: ", error);
+    res
+      .status(500)
+      .json({ message: "error while fetching popular videos", success: false });
+  }
+});
+
 // get all the youtube video from the database
 app.get("/api/fetch/youtubeVideos", async (req, res) => {
   try {
     const page = parseInt(req.query.page);
-    const query = req.query.q;
+    const query = req.query.q.toString();
     const limit = 5;
     // const cachedData = await client.get(`cachedData_page_${page}`);
 
