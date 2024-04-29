@@ -202,7 +202,7 @@ app.get("/api/fetch/popularVideos", async (req, res) => {
 app.get("/api/fetch/youtubeVideos", async (req, res) => {
   try {
     const page = parseInt(req.query.page);
-    const query = req.query.q.toString();
+    const query = req.query.q;
     const limit = 5;
     // const cachedData = await client.get(`cachedData_page_${page}`);
 
