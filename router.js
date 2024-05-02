@@ -56,10 +56,15 @@ export const getAllVideoData = (page, limit, query) => {
             if (error) {
               reject(error);
             }
-            if (result && result.rows) {
+            if (result && result.rows.length !== 0) {
               resolve({
-                message: "data fetched",
+                message: 1,
                 data: result.rows,
+              });
+            } else if (result && result.rows.length === 0) {
+              resolve({
+                data: [],
+                message: 0,
               });
             } else {
               reject(new Error("Data not founded, try again later"));
@@ -73,10 +78,15 @@ export const getAllVideoData = (page, limit, query) => {
             if (error) {
               reject(error);
             }
-            if (result && result.rows) {
+            if (result && result.rows.length !== 0) {
               resolve({
-                message: "data fetched",
+                message: 1,
                 data: result.rows,
+              });
+            } else if (result && result.rows.length === 0) {
+              resolve({
+                data: [],
+                message: 0,
               });
             } else {
               reject(new Error("Data not founded, try again later"));
@@ -96,10 +106,33 @@ export const fetchPopularVideos = (page, limit) => {
       (error, result) => {
         if (error) {
           reject(error);
-        } else {
-          resolve(result.rows);
+        } else if (result && result.rows.length !== 0) {
+          resolve({ data: result.rows, message: 1 });
+        } else if (result && result.rows.length === 0) {
+          resolve({ data: [], message: 0 });
         }
       }
     );
   });
+};
+
+export const fetchPopularVideoWithQuery = (query, page, limit) => {
+  const promise = new Promise((resolve, reject) => {
+    const offset = (page - 1) * limit;
+    pool.query(
+      "SELECT ytvids.id, user_id, title, ytvids.vid_id, created_at, tags, like_count FROM ytvids INNER JOIN videos_like_and_dislike ON ytvids.id = videos_like_and_dislike.id WHERE ts @@ to_tsquery('english', $1) ORDER BY like_count DESC, ytvids.id LIMIT $2 OFFSET $3",
+      [query, limit, offset],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else if (result && result.rows.length !== 0) {
+          resolve({ data: result.rows, message: 1 });
+        } else if (result && result.rows.length === 0) {
+          resolve({ data: [], message: 0 });
+        }
+      }
+    );
+  });
+
+  return promise;
 };

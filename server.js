@@ -1,10 +1,14 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { v4 as uuidv4 } from "uuid";
 // import client from "./redisConfig.js";
 
-import { getAllVideoData, addVideo, fetchPopularVideos } from "./router.js";
+import {
+  getAllVideoData,
+  addVideo,
+  fetchPopularVideos,
+  fetchPopularVideoWithQuery,
+} from "./router.js";
 import {
   addVideoIdInSavedPost,
   checkIfVideoIdExists,
@@ -189,7 +193,7 @@ app.get("/api/fetch/popularVideos", async (req, res) => {
     // console.log(typeof page);
     const limit = 5;
     const response = await fetchPopularVideos(page, limit);
-    res.status(200).json({ data: response, success: true });
+    res.status(200).json({ data: response.data, message: response.message });
   } catch (error) {
     console.log("popular videos error: ", error);
     res
@@ -213,16 +217,9 @@ app.get("/api/fetch/youtubeVideos", async (req, res) => {
         .json({ data: JSON.parse(cachedData), message: "cached data" });
     } else {
       const videoResponse = await getAllVideoData(page, limit, query);
-      // await client.set(
-      //   `cachedData_page_${page}`,
-      //   JSON.stringify(videoResponse.data),
-      //   "EX",
-      //   3600
-      // );
-      // await client.disconnect();
       res
         .status(200)
-        .json({ data: videoResponse.data, message: "Data fetched" });
+        .json({ data: videoResponse.data, message: videoResponse.message });
     }
     // console.log("response: ", response);
   } catch (error) {
@@ -427,5 +424,17 @@ app.post("/api/comment/update", async (req, res) => {
     res
       .status(503)
       .json({ message: "Server is unable to update comment at the moment" });
+  }
+});
+
+app.get("/api/fetch/popularVideoWithQuery", async (req, res) => {
+  try {
+    const query = req.query.q;
+    const page = parseInt(req.query.page);
+    const limit = 5;
+    const response = await fetchPopularVideoWithQuery(query, page, limit);
+    res.status(200).json({ data: response.data, message: response.message });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
