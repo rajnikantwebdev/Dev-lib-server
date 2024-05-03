@@ -1,13 +1,13 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { v4 as uuidv4 } from "uuid";
-import client from "./redisConfig.js";
+// import client from "./redisConfig.js";
 
 import {
   getAllVideoData,
-  writeUserData,
-  videoLikesAndDislikes,
+  addVideo,
+  fetchPopularVideos,
+  fetchPopularVideoWithQuery,
 } from "./router.js";
 import {
   addVideoIdInSavedPost,
@@ -58,8 +58,6 @@ import { handlePostPromise } from "./skeltonFunctions.js";
 import pkg from "pg";
 import "dotenv/config";
 
-import createSummary from "./summaryApi.js";
-
 const { Pool } = pkg;
 const app = express();
 
@@ -83,9 +81,6 @@ export const pool = new Pool({
 
 app.get("/", (req, res) => {
   res.send("hello world");
-  const articleUrl =
-    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce";
-  createSummary();
 });
 
 app.post("/api/addNewArticle", async (req, res) => {
@@ -172,7 +167,7 @@ app.post("/api/getAllSavedVideos", async (req, res) => {
     const getAllSavedVideosResponse = await getAllSavedVideos(req.body);
     res.status(200).json({ data: getAllSavedVideosResponse });
   } catch (error) {
-    console.log("error while getting all saved vidoes: ", error);
+    console.log("error while getting all saved videos: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -180,50 +175,52 @@ app.post("/api/getAllSavedVideos", async (req, res) => {
 // add youtube video in the database
 app.post("/addVideo", async (req, res) => {
   try {
-    const unique_id = uuidv4();
-    const addVideoResponse = writeUserData(req.body, unique_id);
-    const addLikeAndDislikeResponse = videoLikesAndDislikes(
-      req.body,
-      unique_id
-    );
-    const response = Promise.all([addLikeAndDislikeResponse, addVideoResponse]);
-    res.status(200).send(response);
+    const { success, id } = await addVideo(req.body);
+    if (success) {
+      res.status(200).send({ success: true, id });
+    } else {
+      res.status(500).send({ success: false, message: "Failed to add video" });
+    }
   } catch (error) {
-    res.status(500).send(error);
+    console.log("error while adding video: ", error);
+    res.status(500).send({ success: false, message: "Internal server error" });
   }
-  // writeUserData(req.body)
-  //   .then((response) => {
-  //     res.status(200).send(response);
-  //   })
-  //   .catch((error) => {
-  //     res.status(500).send(error);
-  //   });
+});
+
+// fetch all popular videos
+app.get("/api/fetch/popularVideos", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page);
+    // console.log(typeof page);
+    const limit = 5;
+    const response = await fetchPopularVideos(page, limit);
+    res.status(200).json({ data: response.data, message: response.message });
+  } catch (error) {
+    console.log("popular videos error: ", error);
+    res
+      .status(500)
+      .json({ message: "error while fetching popular videos", success: false });
+  }
 });
 
 // get all the youtube video from the database
 app.get("/api/fetch/youtubeVideos", async (req, res) => {
   try {
     const page = parseInt(req.query.page);
-    // console.log("page in router: ", page);
+    const query = req.query.q;
     const limit = 5;
     // const cachedData = await client.get(`cachedData_page_${page}`);
+
     const cachedData = false;
     if (cachedData) {
       res
         .status(200)
         .json({ data: JSON.parse(cachedData), message: "cached data" });
     } else {
-      const videoResponse = await getAllVideoData(page, limit);
-      // await client.set(
-      //   `cachedData_page_${page}`,
-      //   JSON.stringify(videoResponse.data),
-      //   "EX",
-      //   3600
-      // );
-
+      const videoResponse = await getAllVideoData(page, limit, query);
       res
         .status(200)
-        .json({ data: videoResponse.data, message: "Data fetched" });
+        .json({ data: videoResponse.data, message: videoResponse.message });
     }
     // console.log("response: ", response);
   } catch (error) {
@@ -450,5 +447,17 @@ app.post("/api/comment/update", async (req, res) => {
     res
       .status(503)
       .json({ message: "Server is unable to update comment at the moment" });
+  }
+});
+
+app.get("/api/fetch/popularVideoWithQuery", async (req, res) => {
+  try {
+    const query = req.query.q;
+    const page = parseInt(req.query.page);
+    const limit = 5;
+    const response = await fetchPopularVideoWithQuery(query, page, limit);
+    res.status(200).json({ data: response.data, message: response.message });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
