@@ -54,6 +54,11 @@ import {
   userFollowerCount
 } from "./userSearchRelatedTransactions.js";
 
+
+
+import { getAllBlogs,createBlog,createBlogReference } from "./BlogRelatedTransactions.js";
+
+
 import { handlePostPromise } from "./skeltonFunctions.js";
 import pkg from "pg";
 import "dotenv/config";
@@ -318,6 +323,42 @@ app.get("/get-userDeta", async (req, res) => {
   }
 });
 
+
+
+
+app.post("/api/comment/delete", async (req, res) => {
+  try {
+    const response = await deleteComment(req.body);
+    res.status(200).json({ response });
+  } catch (error) {
+    console.log("error while deleting comment", error);
+    res.status(503).json({ message: "Server is unable to fulfill request" });
+  }
+});
+
+app.post("/api/comment/update", async (req, res) => {
+  try {
+    const response = await updateComment(req.body);
+    res.status(200).json({ response });
+  } catch (error) {
+    res
+      .status(503)
+      .json({ message: "Server is unable to update comment at the moment" });
+  }
+});
+
+app.get("/api/fetch/popularVideoWithQuery", async (req, res) => {
+  try {
+    const query = req.query.q;
+    const page = parseInt(req.query.page);
+    const limit = 5;
+    const response = await fetchPopularVideoWithQuery(query, page, limit);
+    res.status(200).json({ data: response.data, message: response.message });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 app.listen(process.env.PORT, function () {
   console.log("server Running on Port 4000");
 });
@@ -420,44 +461,23 @@ app.get("/api/user/get_follower_count", (req, res) => {
 
 
 
-app.get("api/user/getfollowingCount",(req,res)=>{
+app.get("/api/user/getfollowingCount",(req,res)=>{
   console.log("I got the following Count Hit");
-  handlePostPromise(followingCount(res),res)
+  handlePostPromise(followingCount(req),res)
 })
 
 
+app.get("/api/blogs",(req,res)=>{
+  console.log("i got the blog hit")
+  handlePostPromise(getAllBlogs(req),res)
+})
 
+app.post("/api/postblog",(req,res)=>{
+  console.log("i got the blog Creation Hit")
+  handlePostPromise(createBlog(req),res)
+})
 
-
-app.post("/api/comment/delete", async (req, res) => {
-  try {
-    const response = await deleteComment(req.body);
-    res.status(200).json({ response });
-  } catch (error) {
-    console.log("error while deleting comment", error);
-    res.status(503).json({ message: "Server is unable to fulfill request" });
-  }
-});
-
-app.post("/api/comment/update", async (req, res) => {
-  try {
-    const response = await updateComment(req.body);
-    res.status(200).json({ response });
-  } catch (error) {
-    res
-      .status(503)
-      .json({ message: "Server is unable to update comment at the moment" });
-  }
-});
-
-app.get("/api/fetch/popularVideoWithQuery", async (req, res) => {
-  try {
-    const query = req.query.q;
-    const page = parseInt(req.query.page);
-    const limit = 5;
-    const response = await fetchPopularVideoWithQuery(query, page, limit);
-    res.status(200).json({ data: response.data, message: response.message });
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
+app.post("/api/post_blog_reference",(req,res)=>{
+  console.log("I got the Blog reference creation Hit")
+  handlePostPromise(createBlogReference(req),res)
+})
